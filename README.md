@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+ 
 # SciResearch-AI (Reasoning CLI for Scientific Papers)
 
 SciResearch-AI automates a **human-like research loop** with **test-time compute (TTC)**, **multi-agent debate**, and **reflection**. It writes and revises a LaTeX paper in a project folder, saving **atomic autosaves** and **timestamped checkpoints** after every edit. You can pause any time to steer or stop.
