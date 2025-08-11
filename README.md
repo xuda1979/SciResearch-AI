@@ -62,6 +62,9 @@ python -m sciresearch_ai.main run --project .\projects\my_paper `
   --reasoning-effort high `
   --temperature 0.2 --top_p 0.9 --max-output-tokens 2000 `
   --enable-code-interpreter   # optional tool
+
+# Quick check that your OpenAI API key works
+python -m sciresearch_ai.main test-openai --model gpt-4o-mini
 ```
 
 **Human control:** after each iteration, press **Enter** to continue, type text to guide, or type **stop** to end.

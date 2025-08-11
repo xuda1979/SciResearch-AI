@@ -48,6 +48,22 @@ def cmd_run(args):
     orch.run()
     print("Run finished. See state.json and logs folder for details.")
 
+def cmd_test_openai(args):
+    from .providers.openai_provider import OpenAIProvider
+    provider = OpenAIProvider(
+        model=args.model,
+        temperature=0.2,
+        top_p=1.0,
+        max_output_tokens=100,
+        reasoning_effort="low",
+        enable_code_interpreter=False,
+    )
+    try:
+        resp = provider.generate("Respond with 'OpenAI connection successful.'", n=1)[0]
+        print("OpenAI response:", resp)
+    except Exception as e:
+        print("OpenAI test failed:", e)
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="sciresearch-ai", description="Automated scientific research CLI")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -74,6 +90,10 @@ def main(argv=None):
     p_run.add_argument("--no-interactive", action="store_true", help="Disable human-in-the-loop prompts")
     p_run.add_argument("--enable-code-interpreter", action="store_true", help="Enable server-side code interpreter tool")
     p_run.set_defaults(func=cmd_run)
+
+    p_test = sub.add_parser("test-openai", help="Send a test prompt to OpenAI and print the response")
+    p_test.add_argument("--model", default="gpt-4o-mini")
+    p_test.set_defaults(func=cmd_test_openai)
 
     args = p.parse_args(argv)
     return args.func(args)
