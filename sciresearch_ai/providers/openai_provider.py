@@ -27,7 +27,7 @@ class OpenAIProvider:
         temperature: float,
         top_p: float,
         max_output_tokens: int,
-        reasoning_effort: str,
+        reasoning_effort: Optional[str] = None,
         enable_code_interpreter: bool = False,
         project_root: Optional[str] = None,
     ):
@@ -160,9 +160,23 @@ class OpenAIProvider:
                 return outputs
 
             reasoning_effort = gen_kwargs.get("reasoning_effort", self.reasoning_effort)
-            include_reasoning = (
-                reasoning_effort is not None or self._model_supports_reasoning()
+ 
+            params = dict(
+                model=self.model,
+                input=prompt,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                max_output_tokens=self.max_output_tokens,
+                tools=tools,
+
+                include_reasoning = (
+                    reasoning_effort is not None or self._model_supports_reasoning()
+                )
+ 
             )
+            if reasoning_effort is not None:
+                params["reasoning"] = {"effort": reasoning_effort}
+            resp = self.client.responses.create(**params)
 
             def _create(include_reasoning_param: bool):
                 req = {

@@ -50,12 +50,13 @@ def cmd_run(args):
 
 def cmd_test_openai(args):
     from .providers.openai_provider import OpenAIProvider
+    reasoning = None if args.reasoning_effort in (None, "none") else args.reasoning_effort
     provider = OpenAIProvider(
         model=args.model,
         temperature=0.2,
         top_p=1.0,
         max_output_tokens=100,
-        reasoning_effort="low",
+        reasoning_effort=reasoning,
         enable_code_interpreter=False,
     )
     try:
@@ -93,6 +94,7 @@ def main(argv=None):
 
     p_test = sub.add_parser("test-openai", help="Send a test prompt to OpenAI and print the response")
     p_test.add_argument("--model", default="gpt-4o-mini")
+    p_test.add_argument("--reasoning-effort", choices=["low","medium","high","none"], default=None)
     p_test.set_defaults(func=cmd_test_openai)
 
     args = p.parse_args(argv)
