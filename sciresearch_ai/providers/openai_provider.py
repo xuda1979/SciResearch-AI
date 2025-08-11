@@ -40,6 +40,18 @@ class OpenAIProvider:
         self.enable_code_interpreter = enable_code_interpreter
         self.project_root = project_root
 
+    def _model_supports_reasoning(self) -> bool:
+        """Return True if the selected model supports the reasoning param."""
+        reasoning_models = {
+            "o1-preview",
+            "o1-mini",
+            "gpt-o1-mini",
+            "gpt-o1-preview",
+            "o3-mini",
+            "gpt-o3-mini",
+        }
+        return any(m in self.model for m in reasoning_models)
+
     # ---- Tool registry
     def _function_tools(self) -> List[Dict[str, Any]]:
         return [
@@ -147,15 +159,38 @@ class OpenAIProvider:
                     outputs.extend(self.generate(prompt, n=1, **gen_kwargs))
                 return outputs
 
-            resp = self.client.responses.create(
-                model=self.model,
-                input=prompt,
-                temperature=self.temperature,
-                top_p=self.top_p,
-                max_output_tokens=self.max_output_tokens,
-                reasoning={"effort": gen_kwargs.get("reasoning_effort", self.reasoning_effort)},
-                tools=tools,
+            reasoning_effort = gen_kwargs.get("reasoning_effort", self.reasoning_effort)
+            include_reasoning = (
+                reasoning_effort is not None or self._model_supports_reasoning()
             )
+
+            def _create(include_reasoning_param: bool):
+                req = {
+                    "model": self.model,
+                    "input": prompt,
+                    "temperature": self.temperature,
+                    "top_p": self.top_p,
+                    "max_output_tokens": self.max_output_tokens,
+                    "tools": tools,
+                }
+                if include_reasoning_param:
+                    reasoning: Dict[str, Any] = {}
+                    if reasoning_effort is not None:
+                        reasoning["effort"] = reasoning_effort
+                    req["reasoning"] = reasoning
+                return self.client.responses.create(**req)
+
+            try:
+                resp = _create(include_reasoning)
+            except APIError as e:
+                if (
+                    include_reasoning
+                    and getattr(e, "code", "") == "unsupported_parameter"
+                    and "reasoning.effort" in str(e)
+                ):
+                    resp = _create(False)
+                else:
+                    raise
 
             # Handle tool calling loop (function tools)
             while True:
