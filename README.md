@@ -64,7 +64,8 @@ python -m sciresearch_ai.main run --project .\projects\my_paper `
   --enable-code-interpreter   # optional tool
 
 # Quick check that your OpenAI API key works
-python -m sciresearch_ai.main test-openai --model gpt-4o-mini
+python -m sciresearch_ai.main test-openai --model gpt-4o-mini --reasoning-effort none
+# (or use a reasoning-capable model and omit `--reasoning-effort`)
 ```
 
 **Human control:** after each iteration, press **Enter** to continue, type text to guide, or type **stop** to end.

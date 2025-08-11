@@ -27,7 +27,7 @@ class OpenAIProvider:
         temperature: float,
         top_p: float,
         max_output_tokens: int,
-        reasoning_effort: str,
+        reasoning_effort: Optional[str] = None,
         enable_code_interpreter: bool = False,
         project_root: Optional[str] = None,
     ):
@@ -147,15 +147,18 @@ class OpenAIProvider:
                     outputs.extend(self.generate(prompt, n=1, **gen_kwargs))
                 return outputs
 
-            resp = self.client.responses.create(
+            reasoning_effort = gen_kwargs.get("reasoning_effort", self.reasoning_effort)
+            params = dict(
                 model=self.model,
                 input=prompt,
                 temperature=self.temperature,
                 top_p=self.top_p,
                 max_output_tokens=self.max_output_tokens,
-                reasoning={"effort": gen_kwargs.get("reasoning_effort", self.reasoning_effort)},
                 tools=tools,
             )
+            if reasoning_effort is not None:
+                params["reasoning"] = {"effort": reasoning_effort}
+            resp = self.client.responses.create(**params)
 
             # Handle tool calling loop (function tools)
             while True:
