@@ -1,9 +1,10 @@
 from __future__ import annotations
-import os, json, shutil, time
+import os, shutil
 from sciresearch_ai.project import Project
 from sciresearch_ai.config import RunConfig
 from sciresearch_ai.orchestrator import Orchestrator
 from sciresearch_ai.providers.mock_provider import MockProvider
+
 
 def run_smoke(tmp_root: str) -> str:
     if os.path.exists(tmp_root):
@@ -18,3 +19,9 @@ def run_smoke(tmp_root: str) -> str:
     assert os.path.exists(os.path.join(prj.root, "revisions"))
     # return path for inspection
     return prj.root
+
+
+def test_run_smoke(tmp_path):
+    run_smoke(str(tmp_path))
+
+
