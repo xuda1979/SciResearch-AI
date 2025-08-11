@@ -45,60 +45,52 @@ class OpenAIProvider:
         return [
             {
                 "type": "function",
-                "function": {
-                    "name": "run_python",
-                    "description": "Execute short Python snippets and return stdout/stderr text (no network).",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "code": {"type": "string", "description": "Python code to run"}
-                        },
-                        "required": ["code"]
-                    }
+                "name": "run_python",
+                "description": "Execute short Python snippets and return stdout/stderr text (no network).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "code": {"type": "string", "description": "Python code to run"}
+                    },
+                    "required": ["code"]
                 },
             },
             {
                 "type": "function",
-                "function": {
-                    "name": "check_symbolic_equality",
-                    "description": "Check if two mathematical expressions are symbolically equal.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "expr1": {"type": "string"},
-                            "expr2": {"type": "string"}
-                        },
-                        "required": ["expr1","expr2"]
-                    }
+                "name": "check_symbolic_equality",
+                "description": "Check if two mathematical expressions are symbolically equal.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "expr1": {"type": "string"},
+                        "expr2": {"type": "string"}
+                    },
+                    "required": ["expr1","expr2"]
                 },
             },
             {
                 "type": "function",
-                "function": {
-                    "name": "write_project_file",
-                    "description": "Write a text file under the project folder (e.g., code/, notes/).",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "relative_path": {"type": "string", "description": "Relative path inside project, e.g., 'code/exp.py'"},
-                            "content": {"type": "string"}
-                        },
-                        "required": ["relative_path","content"]
-                    }
+                "name": "write_project_file",
+                "description": "Write a text file under the project folder (e.g., code/, notes/).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "relative_path": {"type": "string", "description": "Relative path inside project, e.g., 'code/exp.py'"},
+                        "content": {"type": "string"}
+                    },
+                    "required": ["relative_path","content"]
                 },
             },
             {
                 "type": "function",
-                "function": {
-                    "name": "list_project_files",
-                    "description": "List files under a relative path inside the project.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "relative_path": {"type": "string", "description": "Directory path, e.g., 'code/'"},
-                        },
-                        "required": ["relative_path"]
-                    }
+                "name": "list_project_files",
+                "description": "List files under a relative path inside the project.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "relative_path": {"type": "string", "description": "Directory path, e.g., 'code/'"},
+                    },
+                    "required": ["relative_path"]
                 },
             },
         ]
@@ -148,7 +140,7 @@ class OpenAIProvider:
         try:
             tools = self._function_tools()
             if self.enable_code_interpreter:
-                tools = [{"type": "code_interpreter"}] + tools
+                tools = [{"type": "code_interpreter", "name": "code_interpreter"}] + tools
             # We keep it simple: single prompt per call; if n>1, loop.
             if n > 1:
                 for _ in range(n):
