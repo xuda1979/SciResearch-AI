@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+
 @dataclass
 class RunConfig:
     model: str = "gpt-5-chat-latest"
@@ -17,3 +18,14 @@ class RunConfig:
     budget_usd: Optional[float] = None  # soft budget tracker (not enforced by API)
     interactive: bool = True
     enable_code_interpreter: bool = False  # GPT-5 tool: server-side code interpreter
+
+
+@dataclass
+class RLConfig:
+    """Hyperparameters for reinforcement learning fine-tuning."""
+
+    learning_rate: float = 1e-5
+    batch_size: int = 4
+    mini_batch_size: int = 1
+    gradient_accumulation_steps: int = 1
+    epochs: int = 1

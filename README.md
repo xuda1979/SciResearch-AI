@@ -144,6 +144,7 @@ The OpenAI provider enables **Responses API** tools:
 - **`Set OPENAI_API_KEY`**: required for the OpenAI provider.
 - **Model not found**: ensure your account has access to the selected GPT‑5 model ID.
 - **LaTeX compile**: this project writes `.tex`; PDF compilation is not included. Use your local TeX toolchain (TeX Live/MiKTeX).
+- **Proxy errors during pip**: try appending `--proxy=""` to `pip install` to bypass restrictive proxy settings.
 
 ---
 
@@ -152,3 +153,52 @@ The OpenAI provider enables **Responses API** tools:
 - Bandit-of-Thought strategy allocation
 - Literature search + BibTeX grounding
 - Optional PDF compilation step
+ 
+---
+
+## Fine-tuning the OSS 120B model
+
+ The repository ships a lightweight wrapper around the open-source
+`openai/oss-120b` model. The upstream implementation is vendored under
+[`gpt_oss/`](gpt_oss) for reference. Generated data from different
+providers can be normalized with `sciresearch_ai.data.ingestion` and
+stored as JSONL. The
+ RL training script consumes this file and performs PPO fine-tuning:
+
+```bash
+python scripts/train_rl.py --data data/rl_data.jsonl --output checkpoints/oss-rl
+```
+
+To run training on Huawei Ascend NPUs (e.g., 910B), install the
+[`torch-npu`](https://www.hiascend.com/en/software) backend and pass
+`--npu`:
+
+```bash
+python scripts/train_rl.py --data data/rl_data.jsonl --output checkpoints/oss-rl --npu
+```
+
+To use the fine-tuned weights during paper generation, supply the path to
+`PaperManager`:
+
+```python
+from sciresearch_ai.paper.manager import PaperManager
+pm = PaperManager(root="projects/my_paper", model_path="checkpoints/oss-rl")
+print(pm.generate_text("Summarize the results."))
+```
+
+Omit `model_path` to fall back to the base model.
+
+### Quick inference
+
+For a light-weight smoke test of the wrapper, `scripts/infer_oss.py` loads
+the base or fine-tuned model and prints a completion for a given prompt:
+
+```bash
+python scripts/infer_oss.py "Hello from OSS" --max-new-tokens 20
+```
+
+Add `--npu` to execute the model on an Ascend device:
+
+```bash
+python scripts/infer_oss.py "Hello from OSS" --max-new-tokens 20 --npu
+```

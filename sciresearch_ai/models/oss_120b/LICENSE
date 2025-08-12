@@ -1,0 +1,4 @@
+The OpenAI OSS 120B model code bundled in this repository is provided for
+reference purposes. The upstream sources live under the top-level
+`gpt_oss/` directory and are licensed under the Apache License, Version 2.0.
+See `gpt_oss/LICENSE` for the full license text.
