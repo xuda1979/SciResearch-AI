@@ -1,0 +1,2 @@
+{"provider": "mock", "prompt": "Hello", "response": "Hi"}
+{"provider": "mock", "prompt": "Bye", "response": "Goodbye"}
