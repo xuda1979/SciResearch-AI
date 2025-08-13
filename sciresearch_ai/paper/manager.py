@@ -1,5 +1,5 @@
 from __future__ import annotations
-import os, json, shutil, time, datetime
+import os, json, shutil, time, datetime, subprocess
 from typing import Dict, Any, Optional
 
 from sciresearch_ai.models.oss_120b import load_model
@@ -53,6 +53,25 @@ class PaperManager:
         now = datetime.datetime.now(); ts = now.strftime("%Y%m%d-%H%M%S") + f"-{int(now.microsecond/1000):03d}"
         snap = os.path.join(self.rev_dir, f"draft-{ts}.tex")
         shutil.copy2(self.draft_path, snap)
+
+    def compile_pdf(self) -> bool:
+        """Run pdflatex on the current draft. Returns True on success."""
+        cmd = ["pdflatex", "-interaction=nonstopmode", os.path.basename(self.draft_path)]
+        try:
+            proc = subprocess.run(
+                cmd,
+                cwd=self.paper_dir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+        except FileNotFoundError:
+            self.log("pdflatex not found")
+            return False
+        log_path = os.path.join(self.logs_dir, "pdflatex.log")
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(proc.stdout)
+        return proc.returncode == 0
 
     def log(self, text: str) -> None:
         ts = time.strftime("%Y%m%d-%H%M%S")

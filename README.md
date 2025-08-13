@@ -41,6 +41,8 @@ pip install -r requirements.txt
   ```powershell
   $env:OPENAI_API_KEY="sk-..."
   ```
+- To enable web search tools: install `exa_py` and set `EXA_API_KEY`.
+- The sandboxed Python tool requires Docker or a compatible container runtime.
 
 ---
 
@@ -144,7 +146,7 @@ The OpenAI provider enables **Responses API** tools:
 ## Troubleshooting
 - **`Set OPENAI_API_KEY`**: required for the OpenAI provider.
 - **Model not found**: ensure your account has access to the selected GPT‑5 model ID.
-- **LaTeX compile**: this project writes `.tex`; PDF compilation is not included. Use your local TeX toolchain (TeX Live/MiKTeX).
+- **LaTeX compile**: the project writes `.tex`; install a TeX toolchain with `pdflatex` (e.g., `sudo apt-get install texlive-latex-base`, `brew install mactex-no-gui`, or `choco install miktex`) and run `bash scripts/ci_compile_tex.sh` to verify your setup.
 - **Proxy errors during pip**: try appending `--proxy=""` to `pip install` to bypass restrictive proxy settings.
 
 ---
@@ -159,23 +161,43 @@ The OpenAI provider enables **Responses API** tools:
 
 ## Fine-tuning the OSS 120B model
 
- The repository ships a lightweight wrapper around the open-source
+The repository ships a lightweight wrapper around the open-source
 `openai/oss-120b` model. The upstream implementation is vendored under
 [`gpt_oss/`](gpt_oss) for reference. Generated data from different
 providers can be normalized with `sciresearch_ai.data.ingestion` and
 stored as JSONL. The
  RL training script consumes this file and performs PPO fine-tuning:
 
+### Downloading the weights
+
+Fetch checkpoints from Hugging Face using the helper script (requires
+[`git-lfs`](https://git-lfs.com/)):
+
+```bash
+python scripts/download_oss_weights.py --repo openai/oss-120b --out ./oss-120b
+```
+
 ```bash
 python scripts/train_rl.py --data data/rl_data.jsonl --output checkpoints/oss-rl
 ```
 
-To run training on Huawei Ascend NPUs (e.g., 910B), install the
-[`torch-npu`](https://www.hiascend.com/en/software) backend and pass
-`--npu`:
+Select the device explicitly with `--device` (`cpu`, `cuda`, or `npu`):
 
 ```bash
-python scripts/train_rl.py --data data/rl_data.jsonl --output checkpoints/oss-rl --npu
+python scripts/train_rl.py --data data/rl_data.jsonl --output checkpoints/oss-rl --device cuda
+```
+
+### Generating training data
+
+Use the OSS model itself to create supervised examples:
+
+```bash
+python scripts/gen_oss_data.py \
+  --prompt "Explain reinforcement learning" \
+  --samples 4 \
+  --out data/rl_data.jsonl \
+  --device cuda \
+  --max-new-tokens 200
 ```
 
 To use the fine-tuned weights during paper generation, supply the path to
@@ -195,11 +217,27 @@ For a light-weight smoke test of the wrapper, `scripts/infer_oss.py` loads
 the base or fine-tuned model and prints a completion for a given prompt:
 
 ```bash
-python scripts/infer_oss.py "Hello from OSS" --max-new-tokens 20
+python scripts/infer_oss.py "Hello from OSS" --device cpu --max-new-tokens 20
 ```
 
-Add `--npu` to execute the model on an Ascend device:
+Add `--device npu` to execute the model on an Ascend device, or `--device cuda` for GPUs:
 
 ```bash
-python scripts/infer_oss.py "Hello from OSS" --max-new-tokens 20 --npu
+python scripts/infer_oss.py "Hello from OSS" --device npu --max-new-tokens 20
 ```
+
+### Using the OSS model in the research loop
+
+The main CLI supports the open-source model through the `oss` provider. This
+allows local inference and optional tools such as web search (via the
+`SimpleBrowser` tool) and a sandboxed Python runtime.
+
+```bash
+python -m sciresearch_ai.main run --project ./projects/my_paper \
+  --provider oss --enable-browser --enable-python --max-iterations 2
+```
+
+`--enable-browser` attaches a lightweight web-search tool (via Exa), and
+`--enable-python` exposes a sandboxed Python runtime for quick calculations.
+Add `--model` to supply fine-tuned checkpoints; omitting it defaults to the
+base `openai/oss-120b` weights.

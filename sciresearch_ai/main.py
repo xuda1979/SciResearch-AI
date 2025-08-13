@@ -18,6 +18,15 @@ def build_provider(args, project_root: str):
             enable_code_interpreter=args.enable_code_interpreter,
             project_root=project_root,
         )
+    elif args.provider == "oss":
+        from .providers.oss_provider import OssProvider
+        checkpoint = None if args.model == "gpt-5-chat-latest" else args.model
+        return OssProvider(
+            checkpoint=checkpoint,
+            reasoning_effort=args.reasoning_effort,
+            enable_browser=args.enable_browser,
+            enable_python=args.enable_python,
+        )
     else:
         raise SystemExit(f"Unknown provider: {args.provider}")
 
@@ -76,7 +85,7 @@ def main(argv=None):
 
     p_run = sub.add_parser("run", help="Run the research loop on an existing project")
     p_run.add_argument("--project", required=True, help="Path to project folder")
-    p_run.add_argument("--provider", choices=["mock", "openai"], default="mock")
+    p_run.add_argument("--provider", choices=["mock", "openai", "oss"], default="mock")
     p_run.add_argument("--model", default="gpt-5-chat-latest")
     p_run.add_argument("--max-iterations", type=int, default=5)
     p_run.add_argument("--samples-per-query", type=int, default=5)
@@ -90,6 +99,8 @@ def main(argv=None):
     p_run.add_argument("--budget-usd", type=float, default=None)
     p_run.add_argument("--no-interactive", action="store_true", help="Disable human-in-the-loop prompts")
     p_run.add_argument("--enable-code-interpreter", action="store_true", help="Enable server-side code interpreter tool")
+    p_run.add_argument("--enable-browser", action="store_true", help="Enable web search tool for OSS provider")
+    p_run.add_argument("--enable-python", action="store_true", help="Enable Python tool for OSS provider")
     p_run.set_defaults(func=cmd_run)
 
     p_test = sub.add_parser("test-openai", help="Send a test prompt to OpenAI and print the response")
