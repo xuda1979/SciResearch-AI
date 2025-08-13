@@ -65,7 +65,11 @@ class Orchestrator:
                 tex = f.read()
             new_tex = tex.replace("TBD.", methods[:2000] + "\nTBD.")
             pm.autosave(new_tex)
-            pm.log(f"Iter {state['iter']}: plan, experiment, review added.")
+            ok = pm.compile_pdf()
+            pm.log(
+                f"Iter {state['iter']}: plan, experiment, review added. "
+                f"PDF compile {'succeeded' if ok else 'failed'}"
+            )
 
             # 6) Save state
             state["iter"] += 1
@@ -85,6 +89,8 @@ class Orchestrator:
                     with open(pm.draft_path, "a", encoding="utf-8") as f:
                         f.write("\n% HUMAN NOTE: " + user + "\n")
                     pm.autosave(open(pm.draft_path, "r", encoding="utf-8").read())
+                    ok = pm.compile_pdf()
+                    pm.log(f"HITL note added. PDF compile {'succeeded' if ok else 'failed'}")
                 if self.stop_flag:
                     state["status"] = "stopped_by_user"; break
 

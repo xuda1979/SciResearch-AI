@@ -16,14 +16,19 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--data", required=True, help="Path to JSONL dataset")
     p.add_argument("--output", default="checkpoints/oss-120b-rl", help="Where to save fine-tuned weights")
     p.add_argument("--model", default=None, help="Optional model name or path")
-    p.add_argument("--npu", action="store_true", help="Use Ascend NPU for training")
+    p.add_argument(
+        "--device",
+        choices=["cpu", "cuda", "npu"],
+        default=None,
+        help="Device for training",
+    )
     return p.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     cfg = RLConfig()
-    model, tokenizer = load_model(args.model, device="npu" if args.npu else None)
+    model, tokenizer = load_model(args.model, device=args.device)
     ds = load_dataset("json", data_files=args.data)["train"]
 
     ppo_config = PPOConfig(
