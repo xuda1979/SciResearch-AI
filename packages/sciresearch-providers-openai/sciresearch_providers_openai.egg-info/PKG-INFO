@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: sciresearch-providers-openai
+Version: 0.1.0
+Requires-Dist: openai
+Requires-Dist: httpx
+Requires-Dist: sympy
+Dynamic: requires-dist
