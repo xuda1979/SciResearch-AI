@@ -1,0 +1,2 @@
+[console_scripts]
+sciresearch-ai = sciresearch_cli.main:main
