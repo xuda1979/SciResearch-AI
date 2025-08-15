@@ -7,11 +7,11 @@ from .types import (
     FunctionCallItem,
     Item,
     ReasoningItem,
+    ReasoningTextContentItem,
     ResponseObject,
     TextContentItem,
-    ReasoningTextContentItem,
-    WebSearchCallItem,
     UrlCitation,
+    WebSearchCallItem,
 )
 
 
@@ -105,25 +105,37 @@ class ResponseContentPartDone(ResponseEvent):
     content_index: int = 0
     part: Union[TextContentItem, ReasoningTextContentItem]
 
+
 class ResponseOutputTextAnnotationAdded(ResponseEvent):
-    type: Literal["response.output_text.annotation.added"] = "response.output_text.annotation.added"
+    type: Literal["response.output_text.annotation.added"] = (
+        "response.output_text.annotation.added"
+    )
     item_id: str = "item_1234"
     output_index: int = 0
     content_index: int = 0
     annotation_index: int = 0
     annotation: UrlCitation
 
+
 class ResponseWebSearchCallInProgress(ResponseEvent):
-    type: Literal["response.web_search_call.in_progress"] = "response.web_search_call.in_progress"
+    type: Literal["response.web_search_call.in_progress"] = (
+        "response.web_search_call.in_progress"
+    )
     output_index: int = 0
     item_id: str = "item_1234"
+
 
 class ResponseWebSearchCallSearching(ResponseEvent):
-    type: Literal["response.web_search_call.searching"] = "response.web_search_call.searching"
+    type: Literal["response.web_search_call.searching"] = (
+        "response.web_search_call.searching"
+    )
     output_index: int = 0
     item_id: str = "item_1234"
 
+
 class ResponseWebSearchCallCompleted(ResponseEvent):
-    type: Literal["response.web_search_call.completed"] = "response.web_search_call.completed"
+    type: Literal["response.web_search_call.completed"] = (
+        "response.web_search_call.completed"
+    )
     output_index: int = 0
     item_id: str = "item_1234"

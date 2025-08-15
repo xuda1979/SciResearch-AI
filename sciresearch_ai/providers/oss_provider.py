@@ -1,6 +1,7 @@
 from __future__ import annotations
-import datetime
+
 import asyncio
+import datetime
 from typing import List, Optional
 
 from openai_harmony import (
@@ -9,19 +10,20 @@ from openai_harmony import (
     DeveloperContent,
     HarmonyEncodingName,
     Message,
+    ReasoningEffort,
     Role,
+    StreamableParser,
     SystemContent,
     TextContent,
-    StreamableParser,
     load_harmony_encoding,
-    ReasoningEffort,
 )
 
+from gpt_oss.responses_api.inference.transformers import (
+    setup_model as _setup_transformers,
+)
+from gpt_oss.tools.python_docker.docker_tool import PythonTool
 from gpt_oss.tools.simple_browser import SimpleBrowserTool
 from gpt_oss.tools.simple_browser.backend import ExaBackend
-from gpt_oss.tools.python_docker.docker_tool import PythonTool
-from gpt_oss.responses_api.inference.transformers import setup_model as _setup_transformers
-
 
 REASONING_EFFORT = {
     "high": ReasoningEffort.HIGH,
@@ -63,7 +65,9 @@ class OssProvider:
     def _system_message(self) -> Message:
         content = (
             SystemContent.new()
-            .with_reasoning_effort(REASONING_EFFORT.get(self.reasoning_effort, ReasoningEffort.LOW))
+            .with_reasoning_effort(
+                REASONING_EFFORT.get(self.reasoning_effort, ReasoningEffort.LOW)
+            )
             .with_conversation_start_date(datetime.datetime.now().strftime("%Y-%m-%d"))
         )
         if self.browser_tool:
@@ -98,13 +102,17 @@ class OssProvider:
         ).with_recipient("assistant")
         return [error]
 
-    def _token_generator(self, tokens: List[int], stop: List[int], max_new_tokens: Optional[int]):
+    def _token_generator(
+        self, tokens: List[int], stop: List[int], max_new_tokens: Optional[int]
+    ):
         new_request = True
         produced = 0
         while True:
             if max_new_tokens is not None and produced >= max_new_tokens:
                 break
-            next_tok = self._infer_next_token(tokens, temperature=0.0, new_request=new_request)
+            next_tok = self._infer_next_token(
+                tokens, temperature=0.0, new_request=new_request
+            )
             new_request = False
             tokens.append(next_tok)
             yield next_tok
@@ -131,7 +139,9 @@ class OssProvider:
             remaining = max_new_tokens
             while True:
                 conversation = Conversation.from_messages(messages)
-                tokens = self.encoding.render_conversation_for_completion(conversation, Role.ASSISTANT)
+                tokens = self.encoding.render_conversation_for_completion(
+                    conversation, Role.ASSISTANT
+                )
                 parser = StreamableParser(self.encoding, role=Role.ASSISTANT)
                 produced = 0
                 for tok in self._token_generator(
@@ -143,7 +153,9 @@ class OssProvider:
                     produced += 1
                 messages.extend(parser.messages)
                 last = messages[-1]
-                if last.recipient is None or (remaining is not None and remaining - produced <= 0):
+                if last.recipient is None or (
+                    remaining is not None and remaining - produced <= 0
+                ):
                     outputs.append(last.content[0].text)
                     break
                 remaining = None if remaining is None else remaining - produced

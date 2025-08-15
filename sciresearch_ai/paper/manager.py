@@ -1,6 +1,12 @@
 from __future__ import annotations
-import os, json, shutil, time, datetime, subprocess
-from typing import Dict, Any, Optional
+
+import datetime
+import json
+import os
+import shutil
+import subprocess
+import time
+from typing import Any, Dict, Optional
 
 from sciresearch_ai.models.oss_120b import load_model
 
@@ -21,7 +27,14 @@ class PaperManager:
         self.logs_dir = os.path.join(self.root, "logs")
         self.rev_dir = os.path.join(self.root, "revisions")
         os.makedirs(self.paper_dir, exist_ok=True)
-        for d in [self.fig_dir, self.code_dir, self.data_dir, self.notes_dir, self.logs_dir, self.rev_dir]:
+        for d in [
+            self.fig_dir,
+            self.code_dir,
+            self.data_dir,
+            self.notes_dir,
+            self.logs_dir,
+            self.rev_dir,
+        ]:
             os.makedirs(d, exist_ok=True)
         self.state_path = os.path.join(self.root, "state.json")
         self.draft_path = os.path.join(self.paper_dir, "draft.tex")
@@ -38,7 +51,9 @@ class PaperManager:
     def generate_text(self, prompt: str, max_new_tokens: int = 200) -> str:
         """Generate text using the (optionally) fine-tuned model."""
         if self._model is None or self._tokenizer is None:
-            self._model, self._tokenizer = load_model(self.model_path, device=self.device)
+            self._model, self._tokenizer = load_model(
+                self.model_path, device=self.device
+            )
         inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device)
         outputs = self._model.generate(**inputs, max_new_tokens=max_new_tokens)
         return self._tokenizer.decode(outputs[0], skip_special_tokens=True)
@@ -50,13 +65,18 @@ class PaperManager:
             f.write(content)
         os.replace(tmp, self.draft_path)
         # checkpoint snapshot
-        now = datetime.datetime.now(); ts = now.strftime("%Y%m%d-%H%M%S") + f"-{int(now.microsecond/1000):03d}"
+        now = datetime.datetime.now()
+        ts = now.strftime("%Y%m%d-%H%M%S") + f"-{int(now.microsecond/1000):03d}"
         snap = os.path.join(self.rev_dir, f"draft-{ts}.tex")
         shutil.copy2(self.draft_path, snap)
 
     def compile_pdf(self) -> bool:
         """Run pdflatex on the current draft. Returns True on success."""
-        cmd = ["pdflatex", "-interaction=nonstopmode", os.path.basename(self.draft_path)]
+        cmd = [
+            "pdflatex",
+            "-interaction=nonstopmode",
+            os.path.basename(self.draft_path),
+        ]
         try:
             proc = subprocess.run(
                 cmd,

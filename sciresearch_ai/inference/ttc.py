@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Callable, List, Dict, Any
+
 import math
+from typing import Any, Callable, Dict, List
 
 # --- Test-Time Compute (TTC) strategies ---
 # Self-consistency / Best-of-N with majority vote + simple scoring hooks.
+
 
 def self_consistency(
     provider_generate: Callable[[str, int], List[str]],
@@ -25,6 +27,7 @@ def self_consistency(
         best_idx = max(range(len(samples)), key=lambda i: counts[samples[i]])
         scores = [counts[s] for s in samples]
     return {"best": samples[best_idx], "samples": samples, "scores": scores}
+
 
 def budgeted_adaptive_deliberation(
     provider_generate: Callable[[str, int], List[str]],
@@ -52,10 +55,13 @@ def budgeted_adaptive_deliberation(
         all_scores.extend(new_scores)
         spent += take
         # check margin-early-stop
-        b_idx = max(range(len(all_samples)), key=lambda i: all_scores[i] if all_scores else 0.0)
+        b_idx = max(
+            range(len(all_samples)), key=lambda i: all_scores[i] if all_scores else 0.0
+        )
         b_score = all_scores[b_idx] if all_scores else 0.0
         if b_score - best_score > early_stop_margin:
-            best = all_samples[b_idx]; best_score = b_score
+            best = all_samples[b_idx]
+            best_score = b_score
         # if the best is sufficiently ahead of the current average, stop early
         avg = sum(all_scores) / max(1, len(all_scores))
         if best_score >= avg + early_stop_margin:

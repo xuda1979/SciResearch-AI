@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+
 from sciresearch_ai.providers import OssProvider
 
 
@@ -22,8 +23,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Maximum number of tokens to generate",
     )
-    p.add_argument("--enable-browser", action="store_true", help="Allow web search tool")
-    p.add_argument("--enable-python", action="store_true", help="Allow sandboxed Python tool")
+    p.add_argument(
+        "--enable-browser", action="store_true", help="Allow web search tool"
+    )
+    p.add_argument(
+        "--enable-python", action="store_true", help="Allow sandboxed Python tool"
+    )
     return p.parse_args()
 
 

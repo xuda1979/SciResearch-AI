@@ -6,13 +6,14 @@ one token at a time to mimic the behavior of the Triton implementation.
 import os
 from typing import Callable, List, Optional
 
-# Transformers imports
-from transformers import AutoModelForCausalLM, PreTrainedModel
 import torch
 
+# Transformers imports
+from transformers import AutoModelForCausalLM, PreTrainedModel
 
 DEFAULT_TEMPERATURE = 0.0
 TP = os.environ.get("TP", 2)
+
 
 def load_model(checkpoint: str, device: Optional[str] = None):
     """Serve the model directly with the Auto API.
@@ -49,16 +50,23 @@ def get_infer_next_token(model: PreTrainedModel):
     def infer_next_token(
         tokens: List[int],
         temperature: float = DEFAULT_TEMPERATURE,
-        new_request: bool = False, # kept for interface compatibility; unused here
+        new_request: bool = False,  # kept for interface compatibility; unused here
     ) -> int:
         tokens = torch.tensor([tokens], dtype=torch.int64, device=model.device)
-        output = model.generate(tokens, max_new_tokens=1, do_sample=temperature != 0, temperature=temperature)
+        output = model.generate(
+            tokens,
+            max_new_tokens=1,
+            do_sample=temperature != 0,
+            temperature=temperature,
+        )
         return output[0, -1].tolist()
 
     return infer_next_token
 
 
-def setup_model(checkpoint: str, device: Optional[str] = None) -> Callable[[List[int], float, bool], int]:
+def setup_model(
+    checkpoint: str, device: Optional[str] = None
+) -> Callable[[List[int], float, bool], int]:
     model = load_model(checkpoint, device=device)
     infer_next_token = get_infer_next_token(model)
     return infer_next_token

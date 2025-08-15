@@ -156,7 +156,7 @@ The OpenAI provider enables **Responses API** tools:
 - Bandit-of-Thought strategy allocation
 - Literature search + BibTeX grounding
 - Optional PDF compilation step
- 
+
 ---
 
 ## Fine-tuning the OSS 120B model

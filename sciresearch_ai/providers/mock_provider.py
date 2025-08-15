@@ -1,9 +1,13 @@
 from __future__ import annotations
-import random, time
-from typing import List, Dict, Any
+
+import random
+import time
+from typing import List
+
 
 class MockProvider:
     name = "mock"
+
     def __init__(self, **kwargs):
         self.kwargs = kwargs
 
@@ -12,6 +16,8 @@ class MockProvider:
         random.seed(hash(prompt) % (2**32))
         out = []
         for i in range(n):
-            out.append(f"[MOCK-{i}] Response for: {prompt[:60]}...\nKey points: hypothesis -> small experiment -> result -> write.")
+            out.append(
+                f"[MOCK-{i}] Response for: {prompt[:60]}...\nKey points: hypothesis -> small experiment -> result -> write."
+            )
         time.sleep(0.01)
         return out

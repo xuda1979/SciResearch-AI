@@ -1,15 +1,20 @@
 from __future__ import annotations
 
 import json
+import sys
+import types
 from pathlib import Path
 from types import SimpleNamespace
-import sys, types
 
-sys.modules.setdefault("datasets", types.SimpleNamespace(load_dataset=lambda *a, **k: None))
+sys.modules.setdefault(
+    "datasets", types.SimpleNamespace(load_dataset=lambda *a, **k: None)
+)
+
 
 class DummyConfig:
     def __init__(self, *a, **k):
         pass
+
 
 sys.modules.setdefault(
     "trl", types.SimpleNamespace(PPOConfig=DummyConfig, PPOTrainer=object)
@@ -45,8 +50,12 @@ def test_train_rl_writes_artifacts(tmp_path, monkeypatch):
     data = tmp_path / "data.jsonl"
     data.write_text(json.dumps({"prompt": "hi", "response": "there"}) + "\n")
 
-    monkeypatch.setattr(trl, "load_model", lambda model, device=None: (DummyModel(), DummyTokenizer()))
-    monkeypatch.setattr(trl, "load_dataset", lambda format, data_files: {"train": ["dummy"]})
+    monkeypatch.setattr(
+        trl, "load_model", lambda model, device=None: (DummyModel(), DummyTokenizer())
+    )
+    monkeypatch.setattr(
+        trl, "load_dataset", lambda format, data_files: {"train": ["dummy"]}
+    )
     monkeypatch.setattr(trl, "PPOTrainer", lambda *a, **k: DummyTrainer())
 
     out = tmp_path / "out"

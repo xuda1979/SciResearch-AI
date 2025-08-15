@@ -1,8 +1,11 @@
 from __future__ import annotations
-import os, shutil
-from sciresearch_ai.project import Project
+
+import os
+import shutil
+
 from sciresearch_ai.config import RunConfig
 from sciresearch_ai.orchestrator import Orchestrator
+from sciresearch_ai.project import Project
 from sciresearch_ai.providers.mock_provider import MockProvider
 
 
@@ -23,5 +26,3 @@ def run_smoke(tmp_root: str) -> str:
 
 def test_run_smoke(tmp_path):
     run_smoke(str(tmp_path))
-
-

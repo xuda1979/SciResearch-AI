@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+
 from datasets import load_dataset
 from trl import PPOConfig, PPOTrainer
 
@@ -14,7 +15,11 @@ from sciresearch_ai.models.oss_120b import load_model
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="RL fine-tuning for OSS 120B")
     p.add_argument("--data", required=True, help="Path to JSONL dataset")
-    p.add_argument("--output", default="checkpoints/oss-120b-rl", help="Where to save fine-tuned weights")
+    p.add_argument(
+        "--output",
+        default="checkpoints/oss-120b-rl",
+        help="Where to save fine-tuned weights",
+    )
     p.add_argument("--model", default=None, help="Optional model name or path")
     p.add_argument(
         "--device",
