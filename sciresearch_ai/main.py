@@ -20,9 +20,9 @@ def build_provider(args, project_root: str):
         )
     elif args.provider == "oss":
         from .providers.oss_provider import OssProvider
-        checkpoint = None if args.model == "gpt-5-chat-latest" else args.model
+        # If --model is not provided, the provider will use its default "openai/oss-120b"
         return OssProvider(
-            checkpoint=checkpoint,
+            checkpoint=args.model,
             reasoning_effort=args.reasoning_effort,
             enable_browser=args.enable_browser,
             enable_python=args.enable_python,
@@ -86,7 +86,7 @@ def main(argv=None):
     p_run = sub.add_parser("run", help="Run the research loop on an existing project")
     p_run.add_argument("--project", required=True, help="Path to project folder")
     p_run.add_argument("--provider", choices=["mock", "openai", "oss"], default="mock")
-    p_run.add_argument("--model", default="gpt-5-chat-latest")
+    p_run.add_argument("--model", default=None, help="For OpenAI, a model ID like 'gpt-5-chat-latest'. For OSS, a local path or Hugging Face model ID.")
     p_run.add_argument("--max-iterations", type=int, default=5)
     p_run.add_argument("--samples-per-query", type=int, default=5)
     p_run.add_argument("--time-budget-sec", type=int, default=1800)
