@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: sciresearch-cli
+Version: 0.1.0
+Requires-Dist: sciresearch-providers-openai
+Dynamic: requires-dist

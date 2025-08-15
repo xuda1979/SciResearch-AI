@@ -1,0 +1,14 @@
+from typing import Protocol, List, Dict, Any
+
+class Strategy(Protocol):
+    def plan(self, problem: str) -> List[str]:
+        ...
+
+    def expand(self, step: str) -> List[str]:
+        ...
+
+    def score(self, step: str, expansions: List[str]) -> Dict[str, float]:
+        ...
+
+    def select(self, scores: Dict[str, float]) -> str:
+        ...
