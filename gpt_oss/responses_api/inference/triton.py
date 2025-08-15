@@ -1,12 +1,10 @@
-import datetime
 import os
 from typing import Callable
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 import torch
-import torch.distributed as dist
 
-from gpt_oss.triton.model import Cache, ModelConfig, Transformer
+from gpt_oss.triton.model import Cache, Transformer
 
 DEFAULT_TEMPERATURE = 0.0
 CONTEXT = 16_384

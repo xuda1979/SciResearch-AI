@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Optional, Tuple
 
 try:  # pragma: no cover - optional dependency
@@ -37,9 +38,7 @@ def load_model(
         transformers dependency is missing, a ``RuntimeError`` is raised.
     """
     if AutoModelForCausalLM is None or AutoTokenizer is None:
-        raise RuntimeError(
-            "transformers is required to load the OSS 120B model"
-        )
+        raise RuntimeError("transformers is required to load the OSS 120B model")
     name = model_name_or_path or DEFAULT_MODEL_NAME
     tokenizer = AutoTokenizer.from_pretrained(name)
     model = AutoModelForCausalLM.from_pretrained(name)
@@ -48,14 +47,14 @@ def load_model(
             try:
                 import torch
                 import torch_npu  # noqa: F401  register NPU backend
+
                 model.to("npu")
             except Exception as exc:  # pragma: no cover - optional dep
-                raise RuntimeError(
-                    "torch-npu is required for NPU execution"
-                ) from exc
+                raise RuntimeError("torch-npu is required for NPU execution") from exc
         else:
             try:
                 import torch
+
                 model.to(device)
             except Exception as exc:  # pragma: no cover - optional dep
                 raise RuntimeError(

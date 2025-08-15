@@ -3,7 +3,6 @@ from __future__ import annotations
 import sys
 import types
 
-import pytest
 
 # Stub heavy optional deps before importing the provider
 class _Role:
@@ -123,13 +122,16 @@ sys.modules.setdefault(
 sys.modules.setdefault(
     "gpt_oss.responses_api.inference.transformers",
     types.SimpleNamespace(
-        setup_model=lambda checkpoint, device=None: (lambda tokens, temperature, new_request: 0)
+        setup_model=lambda checkpoint, device=None: (
+            lambda tokens, temperature, new_request: 0
+        )
     ),
 )
 
+from openai_harmony import Author, Message, Role, TextContent
+
 import sciresearch_ai.providers.oss_provider as op
 from sciresearch_ai.providers.oss_provider import OssProvider
-from openai_harmony import Author, Message, Role, TextContent
 
 
 class DummyTool:
@@ -171,8 +173,9 @@ def setup_fake_model(monkeypatch, messages_seq):
 def test_browser_tool_routing(monkeypatch):
     msgs = [
         [
-            Message.from_role_and_content(Role.ASSISTANT, TextContent(text="q"))
-            .with_recipient("browser.search")
+            Message.from_role_and_content(
+                Role.ASSISTANT, TextContent(text="q")
+            ).with_recipient("browser.search")
         ],
         [Message.from_role_and_content(Role.ASSISTANT, "tool result")],
     ]
@@ -186,8 +189,9 @@ def test_browser_tool_routing(monkeypatch):
 def test_python_tool_routing(monkeypatch):
     msgs = [
         [
-            Message.from_role_and_content(Role.ASSISTANT, TextContent(text="code"))
-            .with_recipient("python")
+            Message.from_role_and_content(
+                Role.ASSISTANT, TextContent(text="code")
+            ).with_recipient("python")
         ],
         [Message.from_role_and_content(Role.ASSISTANT, "py result")],
     ]

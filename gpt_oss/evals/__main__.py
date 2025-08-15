@@ -3,13 +3,10 @@ import json
 from datetime import datetime
 
 from . import report
-from .gpqa_eval import GPQAEval
 from .aime_eval import AIME25Eval
+from .chat_completion_sampler import OPENAI_SYSTEM_MESSAGE_API, ChatCompletionSampler
+from .gpqa_eval import GPQAEval
 from .healthbench_eval import HealthBenchEval
-from .chat_completion_sampler import (
-    OPENAI_SYSTEM_MESSAGE_API,
-    ChatCompletionSampler,
-)
 from .responses_sampler import ResponsesSampler
 
 
@@ -50,9 +47,7 @@ def main():
         default=1584,
         help="Number of threads to run.",
     )
-    parser.add_argument(
-        "--debug", action="store_true", help="Run in debug mode"
-    )
+    parser.add_argument("--debug", action="store_true", help="Run in debug mode")
     parser.add_argument(
         "--examples", type=int, help="Number of examples to use (overrides default)"
     )

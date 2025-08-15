@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import Callable, Dict, Any, List
+
+from typing import Any, Callable, Dict, List
 
 CRITIC_SYS = "You are a meticulous reviewer. Identify errors, missing citations, and unclear logic. Propose concrete fixes."
+
 
 def critique_and_revise(
     provider_generate: Callable[[str, int], List[str]],
@@ -11,11 +13,15 @@ def critique_and_revise(
     history: List[str] = []
     current = draft
     for i in range(passes):
-        critique = provider_generate(f"{CRITIC_SYS}\nPlease review the following draft and critique it:\n{current}", 1)[0]
+        critique = provider_generate(
+            f"{CRITIC_SYS}\nPlease review the following draft and critique it:\n{current}",
+            1,
+        )[0]
         history.append(critique)
         revised = provider_generate(
             "Revise the draft to resolve the above critique. Return only the revised text.\n"
-            f"CRITIQUE:\n{critique}\nDRAFT:\n{current}", 1
+            f"CRITIQUE:\n{critique}\nDRAFT:\n{current}",
+            1,
         )[0]
         current = revised
     return {"final": current, "critiques": history}

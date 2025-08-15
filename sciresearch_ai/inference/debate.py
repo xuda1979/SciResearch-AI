@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import Callable, Dict, Any, List
+
+from typing import Any, Callable, Dict, List
 
 DEBATE_SYS = "You are debating to arrive at a correct, clear, and verifiable solution. Be concise."
+
 
 def multi_agent_debate(
     provider_generate: Callable[[str, int], List[str]],

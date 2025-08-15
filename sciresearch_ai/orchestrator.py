@@ -1,8 +1,10 @@
 from __future__ import annotations
-import time, threading
-from typing import Callable, Dict, Any
+
+import time
+
 from .config import RunConfig
-from .inference import ttc, debate, reflection
+from .inference import debate, reflection, ttc
+
 
 class Orchestrator:
     def __init__(self, project, provider, cfg: RunConfig):
@@ -16,15 +18,19 @@ class Orchestrator:
 
     def _score(self, text: str) -> float:
         # heuristic scoring placeholder: prefer longer, structured answers
-        return min(1.0, 0.2 + 0.0005*len(text)) + text.count("\n")*0.01
+        return min(1.0, 0.2 + 0.0005 * len(text)) + text.count("\n") * 0.01
 
     def run(self):
         pm = self.project.pm
         state = {"iter": 0, "status": "running"}
         start = time.time()
         while state["iter"] < self.cfg.max_iterations:
-            if self.cfg.time_budget_sec and (time.time() - start) > self.cfg.time_budget_sec:
-                state["status"] = "time_budget_exhausted"; break
+            if (
+                self.cfg.time_budget_sec
+                and (time.time() - start) > self.cfg.time_budget_sec
+            ):
+                state["status"] = "time_budget_exhausted"
+                break
 
             # 1) Planning step (concise research objective + plan)
             plan_prompt = (
@@ -39,7 +45,7 @@ class Orchestrator:
                 lambda p, n: self._gen(p, n),
                 prompt=f"Refine this plan into a concrete experiment protocol with brief pseudo-code.\n{plan}",
                 total_budget=self.cfg.samples_per_query,
-                batch_size=max(1, self.cfg.samples_per_query//2),
+                batch_size=max(1, self.cfg.samples_per_query // 2),
                 scorer=self._score,
             )
             experiment = ttc_out["best"]
@@ -48,7 +54,8 @@ class Orchestrator:
             debate_out = debate.multi_agent_debate(
                 lambda p, n: self._gen(p, n),
                 topic_prompt=f"Is the following experiment well-posed and reproducible? Identify pitfalls and fixes.\n{experiment}",
-                n_debaters=2, rounds=1
+                n_debaters=2,
+                rounds=1,
             )
             reviewed = debate_out["consensus"]
 
@@ -56,7 +63,7 @@ class Orchestrator:
             refl = reflection.critique_and_revise(
                 lambda p, n: self._gen(p, n),
                 draft=f"Methods draft (start from this experiment):\n{experiment}",
-                passes=1
+                passes=1,
             )
             methods = refl["final"]
 
@@ -77,7 +84,9 @@ class Orchestrator:
 
             # Human-in-the-loop prompt after each iter (if interactive)
             if self.cfg.interactive:
-                print("\n[HUMAN LOOP] Press Enter to continue, or type a prompt to inject guidance. Type 'stop' to end.")
+                print(
+                    "\n[HUMAN LOOP] Press Enter to continue, or type a prompt to inject guidance. Type 'stop' to end."
+                )
                 try:
                     user = input().strip()
                 except EOFError:
@@ -90,9 +99,12 @@ class Orchestrator:
                         f.write("\n% HUMAN NOTE: " + user + "\n")
                     pm.autosave(open(pm.draft_path, "r", encoding="utf-8").read())
                     ok = pm.compile_pdf()
-                    pm.log(f"HITL note added. PDF compile {'succeeded' if ok else 'failed'}")
+                    pm.log(
+                        f"HITL note added. PDF compile {'succeeded' if ok else 'failed'}"
+                    )
                 if self.stop_flag:
-                    state["status"] = "stopped_by_user"; break
+                    state["status"] = "stopped_by_user"
+                    break
 
         if state["status"] == "running":
             state["status"] = "complete_limit_reached"

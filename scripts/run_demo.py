@@ -1,7 +1,11 @@
-import sys, os, zipfile
+import os
+import sys
+import zipfile
+
 sys.path.insert(0, r"/mnt/data/SciResearch-AI")
-from sciresearch_ai.testing.test_mock_flow import run_smoke
 import tempfile
+
+from sciresearch_ai.testing.test_mock_flow import run_smoke
 
 if __name__ == "__main__":
     tmp_root = tempfile.mkdtemp(prefix="sci_demo_")
