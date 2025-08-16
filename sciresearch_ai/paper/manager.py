@@ -74,7 +74,7 @@ class PaperManager:
         shutil.copy2(self.draft_path, snap)
 
     def validate_citations(self) -> bool:
-        """Check that every \cite{key} has a matching entry in refs.bib."""
+        r"""Check that every \cite{key} has a matching entry in refs.bib."""
         with open(self.draft_path, "r", encoding="utf-8") as f:
             tex = f.read()
         cites = set(re.findall(r"\\cite\{([^}]+)\}", tex))
