@@ -1,9 +1,12 @@
-import pytest
 import os
+
+import pytest
+
 from packages.sciresearch_tools.proj_file_tools import (
-    WriteProjectFileTool,
     ListProjectFilesTool,
+    WriteProjectFileTool,
 )
+
 
 @pytest.mark.asyncio
 async def test_write_and_list_project_files(tmpdir):
@@ -41,6 +44,7 @@ async def test_write_and_list_project_files(tmpdir):
     files = await list_tool()
     assert set(files) == {"test_file.txt", "subdir/test_file2.txt"}
 
+
 @pytest.mark.asyncio
 async def test_write_project_file_traversal(tmpdir):
     """Test that writing outside the base directory is not allowed."""
@@ -53,11 +57,15 @@ async def test_write_project_file_traversal(tmpdir):
     result = await write_tool(filepath, content)
     assert "cannot contain '..'" in result
 
+
 @pytest.mark.asyncio
 async def test_write_project_file_error(tmpdir):
     """Test that write errors are handled gracefully."""
     base_dir = str(tmpdir)
     write_tool = WriteProjectFileTool(base_dir=base_dir)
+
+    if os.geteuid() == 0:
+        pytest.skip("Skipping permission test when running as root")
 
     # Make the directory read-only
     os.chmod(base_dir, 0o555)

@@ -1,17 +1,37 @@
 from __future__ import annotations
 
 import argparse
+import sys
 
 from .config import RunConfig
 from .project import Project
 
 
+def _auto_provider(model: str | None) -> str:
+    """Heuristically choose a provider based on the model string.
+
+    - If the model contains ``oss`` we assume the local OSS wrapper.
+    - If no model is supplied we fall back to the mock provider for tests.
+    - Otherwise we default to the OpenAI provider which can handle ``o3``.
+    """
+
+    if model and "oss" in model.lower():
+        return "oss"
+    if model is None:
+        return "mock"
+    return "openai"
+
+
 def build_provider(args, project_root: str):
-    if args.provider == "mock":
+    provider_name = args.provider
+    if provider_name == "auto":
+        provider_name = _auto_provider(args.model)
+
+    if provider_name == "mock":
         from .providers.mock_provider import MockProvider
 
         return MockProvider()
-    elif args.provider == "openai":
+    elif provider_name == "openai":
         from .providers.openai_provider import OpenAIProvider
 
         return OpenAIProvider(
@@ -23,7 +43,7 @@ def build_provider(args, project_root: str):
             enable_code_interpreter=args.enable_code_interpreter,
             project_root=project_root,
         )
-    elif args.provider == "oss":
+    elif provider_name == "oss":
         from .providers.oss_provider import OssProvider
 
         # If --model is not provided, the provider will use its default "openai/oss-120b"
@@ -34,7 +54,7 @@ def build_provider(args, project_root: str):
             enable_python=args.enable_python,
         )
     else:
-        raise SystemExit(f"Unknown provider: {args.provider}")
+        raise SystemExit(f"Unknown provider: {provider_name}")
 
 
 def cmd_new(args):
@@ -101,11 +121,16 @@ def main(argv=None):
 
     p_run = sub.add_parser("run", help="Run the research loop on an existing project")
     p_run.add_argument("--project", required=True, help="Path to project folder")
-    p_run.add_argument("--provider", choices=["mock", "openai", "oss"], default="mock")
+    p_run.add_argument(
+        "--provider",
+        choices=["auto", "mock", "openai", "oss"],
+        default="auto",
+        help="Select backend; 'auto' infers from --model",
+    )
     p_run.add_argument(
         "--model",
         default=None,
-        help="For OpenAI, a model ID like 'gpt-5-chat-latest'. For OSS, a local path or Hugging Face model ID.",
+        help="Model ID or path. Examples: 'o3-mini', 'gpt-5-chat-latest', or 'oss-120b'",
     )
     p_run.add_argument("--max-iterations", type=int, default=5)
     p_run.add_argument("--samples-per-query", type=int, default=5)
@@ -152,7 +177,6 @@ def main(argv=None):
 
     args = p.parse_args(argv)
     return args.func(args)
- 
 
 
 if __name__ == "__main__":

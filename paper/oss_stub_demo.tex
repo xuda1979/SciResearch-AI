@@ -1,0 +1,59 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\title{Demonstration of the OSS Stub Backend}
+\author{SciResearch-AI}
+\date{\today}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present a synthetic research article generated entirely by the OSS stub
+backend included with SciResearch-AI. The goal is to illustrate the LaTeX
+output format without requiring the full 120B parameter model.
+\end{abstract}
+
+\section{Introduction}
+Large language models are capable of drafting technical papers when paired with
+structured reasoning loops. The OSS stub backend reproduces this process with
+deterministic placeholder text, making it ideal for offline testing.
+
+\section{Methodology}
+Our pipeline follows a plan--write--revise loop. At each step the model produces
+candidate paragraphs, which are then critiqued and refined. The stub backend
+short-circuits generation and emits predefined sentences so that the rest of
+the system can be exercised without heavy dependencies.
+
+\section{Results}
+Table~\ref{tab:ablations} summarizes the quality of the stub output across
+several hypothetical metrics. Although the numbers are fictitious, the table
+demonstrates that the tool chain correctly handles typical LaTeX constructs.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{lcc}
+    \hline
+    Metric & Baseline & Stub \\
+    \hline
+    Coherence score & 0.00 & 0.99 \\
+    Citation accuracy & 0 & 42 \\
+    \hline
+  \end{tabular}
+  \caption{Imaginary ablation study produced by the stub backend.}
+  \label{tab:ablations}
+\end{table}
+
+\section{Conclusion}
+This document serves as a high-quality placeholder that mimics the structure of
+an authentic research paper. When the full OSS model weights are available, the
+same pipeline can produce genuine content.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+\bibitem{demo}
+A.~Author.
+\newblock {Placeholder References for Demonstration}.
+\newblock \emph{Journal of Synthetic Results}, 42(1):1--2, 2024.
+\end{thebibliography}
+
+\end{document}
