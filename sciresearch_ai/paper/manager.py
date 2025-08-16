@@ -3,12 +3,11 @@ from __future__ import annotations
 import datetime
 import json
 import os
+import re
 import shutil
 import subprocess
 import time
 from typing import Any, Dict, Optional
-
-from sciresearch_ai.models.oss_120b import load_model
 
 
 class PaperManager:
@@ -46,11 +45,15 @@ class PaperManager:
         self._model = None
         self._tokenizer = None
         if model_path:
+            from sciresearch_ai.models.oss_120b import load_model
+
             self._model, self._tokenizer = load_model(model_path, device=device)
 
     def generate_text(self, prompt: str, max_new_tokens: int = 200) -> str:
         """Generate text using the (optionally) fine-tuned model."""
         if self._model is None or self._tokenizer is None:
+            from sciresearch_ai.models.oss_120b import load_model
+
             self._model, self._tokenizer = load_model(
                 self.model_path, device=self.device
             )
@@ -69,6 +72,35 @@ class PaperManager:
         ts = now.strftime("%Y%m%d-%H%M%S") + f"-{int(now.microsecond/1000):03d}"
         snap = os.path.join(self.rev_dir, f"draft-{ts}.tex")
         shutil.copy2(self.draft_path, snap)
+
+    def validate_citations(self) -> bool:
+        r"""Check that every \cite{key} has a matching entry in refs.bib."""
+        with open(self.draft_path, "r", encoding="utf-8") as f:
+            tex = f.read()
+        cites = set(re.findall(r"\\cite\{([^}]+)\}", tex))
+        if not cites:
+            return True
+        bib_path = os.path.join(self.paper_dir, "refs.bib")
+        if not os.path.exists(bib_path):
+            self.log("refs.bib missing")
+            return False
+        with open(bib_path, "r", encoding="utf-8") as f:
+            bib = f.read()
+        missing = [c for c in cites if c not in bib]
+        if missing:
+            self.log("Missing citations: " + ",".join(sorted(missing)))
+            return False
+        return True
+
+    def check_innovation(self) -> bool:
+        """Heuristic check that the draft mentions innovation or novelty."""
+        with open(self.draft_path, "r", encoding="utf-8") as f:
+            tex = f.read().lower()
+        keywords = ["novel", "innovation", "innovative", "state-of-the-art"]
+        if any(k in tex for k in keywords):
+            return True
+        self.log("Innovation keywords missing")
+        return False
 
     def compile_pdf(self) -> bool:
         """Run pdflatex on the current draft. Returns True on success."""
@@ -92,6 +124,13 @@ class PaperManager:
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(proc.stdout)
         return proc.returncode == 0
+
+    def validate_paper(self) -> bool:
+        """Run citation, innovation, and LaTeX compile checks."""
+        cit = self.validate_citations()
+        innov = self.check_innovation()
+        comp = self.compile_pdf()
+        return cit and innov and comp
 
     def log(self, text: str) -> None:
         ts = time.strftime("%Y%m%d-%H%M%S")

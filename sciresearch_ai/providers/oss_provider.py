@@ -2,34 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import datetime
-from typing import List, Optional
+import os
+from typing import Any, List, Optional
 
-from openai_harmony import (
-    Author,
-    Conversation,
-    DeveloperContent,
-    HarmonyEncodingName,
-    Message,
-    ReasoningEffort,
-    Role,
-    StreamableParser,
-    SystemContent,
-    TextContent,
-    load_harmony_encoding,
-)
-
-from gpt_oss.responses_api.inference.transformers import (
-    setup_model as _setup_transformers,
-)
-from gpt_oss.tools.python_docker.docker_tool import PythonTool
-from gpt_oss.tools.simple_browser import SimpleBrowserTool
-from gpt_oss.tools.simple_browser.backend import ExaBackend
-
-REASONING_EFFORT = {
-    "high": ReasoningEffort.HIGH,
-    "medium": ReasoningEffort.MEDIUM,
-    "low": ReasoningEffort.LOW,
-}
+# Imports for the heavy OSS model are deferred so that the lightweight stub
+# can run without triggering network downloads of Harmony vocabularies.
+_setup_transformers = None
 
 
 class OssProvider:
@@ -47,26 +25,76 @@ class OssProvider:
         enable_python: bool = False,
     ) -> None:
         self.checkpoint = checkpoint or "openai/oss-120b"
-        # transformers-based incremental generator
-        self._infer_next_token = _setup_transformers(self.checkpoint, device=device)
-        self.encoding = load_harmony_encoding(HarmonyEncodingName.HARMONY_GPT_OSS)
+        backend = os.environ.get("OSS_PROVIDER_BACKEND", "transformers")
+        self._backend = backend
+        if backend == "stub":
+            # The stub backend returns a fixed string and avoids any heavy
+            # initialization or network access.
+            self._infer_next_token = None
+            self.encoding = None
+        else:
+            from openai_harmony import (
+                Author,
+                Conversation,
+                DeveloperContent,
+                HarmonyEncodingName,
+                Message,
+                ReasoningEffort,
+                Role,
+                StreamableParser,
+                SystemContent,
+                TextContent,
+                load_harmony_encoding,
+            )
+
+            from gpt_oss.responses_api.inference.transformers import (
+                setup_model as _setup_transformers,
+            )
+
+            self.Author = Author
+            self.Conversation = Conversation
+            self.DeveloperContent = DeveloperContent
+            self.HarmonyEncodingName = HarmonyEncodingName
+            self.Message = Message
+            self.ReasoningEffort = ReasoningEffort
+            self.Role = Role
+            self.StreamableParser = StreamableParser
+            self.SystemContent = SystemContent
+            self.TextContent = TextContent
+            self.load_harmony_encoding = load_harmony_encoding
+            self.REASONING_EFFORT = {
+                "high": ReasoningEffort.HIGH,
+                "medium": ReasoningEffort.MEDIUM,
+                "low": ReasoningEffort.LOW,
+            }
+
+            # transformers-based incremental generator
+            self._infer_next_token = _setup_transformers(self.checkpoint, device=device)
+            self.encoding = load_harmony_encoding(HarmonyEncodingName.HARMONY_GPT_OSS)
         self.reasoning_effort = reasoning_effort
         self.enable_browser = enable_browser
         self.enable_python = enable_python
-        self.browser_tool: Optional[SimpleBrowserTool] = None
-        self.python_tool: Optional[PythonTool] = None
+        self.browser_tool = None
+        self.python_tool = None
         if enable_browser:
+            from gpt_oss.tools.simple_browser import SimpleBrowserTool
+            from gpt_oss.tools.simple_browser.backend import ExaBackend
+
             backend = ExaBackend(source="web")
             self.browser_tool = SimpleBrowserTool(backend=backend)
         if enable_python:
+            from gpt_oss.tools.python_docker.docker_tool import PythonTool
+
             self.python_tool = PythonTool()
 
     # ---- helpers -----------------------------------------------------
-    def _system_message(self) -> Message:
+    def _system_message(self):
         content = (
-            SystemContent.new()
+            self.SystemContent.new()
             .with_reasoning_effort(
-                REASONING_EFFORT.get(self.reasoning_effort, ReasoningEffort.LOW)
+                self.REASONING_EFFORT.get(
+                    self.reasoning_effort, self.ReasoningEffort.LOW
+                )
             )
             .with_conversation_start_date(datetime.datetime.now().strftime("%Y-%m-%d"))
         )
@@ -74,7 +102,7 @@ class OssProvider:
             content = content.with_tools(self.browser_tool.tool_config)
         if self.python_tool:
             content = content.with_tools(self.python_tool.tool_config)
-        return Message.from_role_and_content(Role.SYSTEM, content)
+        return self.Message.from_role_and_content(self.Role.SYSTEM, content)
 
     async def _run_browser(self, msg: Message) -> List[Message]:
         assert self.browser_tool is not None
@@ -96,9 +124,9 @@ class OssProvider:
         if msg.recipient and msg.recipient.startswith("python") and self.python_tool:
             return asyncio.run(self._run_python(msg))
         # Tool not enabled - send error back to assistant
-        error = Message(
-            author=Author.new(Role.TOOL, msg.recipient or ""),
-            content=[TextContent(text="Tool not available")],
+        error = self.Message(
+            author=self.Author.new(self.Role.TOOL, msg.recipient or ""),
+            content=[self.TextContent(text="Tool not available")],
         ).with_recipient("assistant")
         return [error]
 
@@ -129,20 +157,28 @@ class OssProvider:
         max_new_tokens: Optional[int] = None,
         **gen_kwargs,
     ) -> List[str]:
+        # When running with the stub backend there is no tokenization or
+        # streaming. Return a deterministic placeholder so higher-level
+        # logic can be exercised without the full model stack.
+        if self.encoding is None:
+            return ["This is a demo response from the OSS provider stub."] * n
+
         outputs: List[str] = []
         for _ in range(n):
-            messages: List[Message] = [
+            messages: List[Any] = [
                 self._system_message(),
-                Message.from_role_and_content(Role.DEVELOPER, DeveloperContent.new()),
-                Message.from_role_and_content(Role.USER, prompt),
+                self.Message.from_role_and_content(
+                    self.Role.DEVELOPER, self.DeveloperContent.new()
+                ),
+                self.Message.from_role_and_content(self.Role.USER, prompt),
             ]
             remaining = max_new_tokens
             while True:
-                conversation = Conversation.from_messages(messages)
+                conversation = self.Conversation.from_messages(messages)
                 tokens = self.encoding.render_conversation_for_completion(
-                    conversation, Role.ASSISTANT
+                    conversation, self.Role.ASSISTANT
                 )
-                parser = StreamableParser(self.encoding, role=Role.ASSISTANT)
+                parser = self.StreamableParser(self.encoding, role=self.Role.ASSISTANT)
                 produced = 0
                 for tok in self._token_generator(
                     tokens,
