@@ -72,6 +72,7 @@ OSS_PROVIDER_BACKEND=stub python -m sciresearch_ai.main run --project .\projects
 # The stub mode runs entirely offline and skips Harmony vocab downloads.
 
 # Swap models by editing `--model`; the CLI infers the provider automatically.
+# You can omit `--provider` because it defaults to `auto`.
 
 # Quick check that your OpenAI API key works
 python -m sciresearch_ai.main test-openai --model gpt-4o-mini --reasoning-effort none
