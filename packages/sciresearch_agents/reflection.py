@@ -1,12 +1,17 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from .protocols import Strategy
+
 
 class Reflection(Strategy):
     def plan(self, problem: str) -> List[str]:
         return [f"reflection step 1 for {problem}", f"reflection step 2 for {problem}"]
 
     def expand(self, step: str) -> List[str]:
-        return [f"reflection expansion 1 for {step}", f"reflection expansion 2 for {step}"]
+        return [
+            f"reflection expansion 1 for {step}",
+            f"reflection expansion 2 for {step}",
+        ]
 
     def score(self, step: str, expansions: List[str]) -> Dict[str, float]:
         # Reflection might involve self-correction, so scores could be adjusted

@@ -1,11 +1,12 @@
-import unittest
-import tempfile
-import shutil
 import re
+import shutil
+import tempfile
+import unittest
 from pathlib import Path
 
+from packages.sciresearch_paper.paper_writer import DEFAULT_TEX, PaperWriter
 from packages.sciresearch_paper.project_fs import ProjectFS
-from packages.sciresearch_paper.paper_writer import PaperWriter, DEFAULT_TEX
+
 
 class TestPaperWriter(unittest.TestCase):
     def setUp(self):
@@ -42,6 +43,7 @@ class TestPaperWriter(unittest.TestCase):
         # Check checkpoint naming
         match = re.match(r"draft-\d{8}-\d{6}-\d{3}\.tex", snap_path.name)
         self.assertIsNotNone(match)
+
 
 if __name__ == "__main__":
     unittest.main()

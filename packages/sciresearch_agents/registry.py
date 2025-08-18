@@ -1,9 +1,10 @@
 from typing import Dict, Type
-from .protocols import Strategy
-from .ttc import TTC
+
 from .bad import BAD
 from .debate import Debate
+from .protocols import Strategy
 from .reflection import Reflection
+from .ttc import TTC
 
 STRATEGIES: Dict[str, Type[Strategy]] = {
     "ttc": TTC,
@@ -11,6 +12,7 @@ STRATEGIES: Dict[str, Type[Strategy]] = {
     "debate": Debate,
     "reflection": Reflection,
 }
+
 
 def get_strategy(name: str) -> Strategy:
     strategy_class = STRATEGIES.get(name)

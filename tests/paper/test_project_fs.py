@@ -1,9 +1,10 @@
-import unittest
-import tempfile
 import shutil
+import tempfile
+import unittest
 from pathlib import Path
 
 from packages.sciresearch_paper.project_fs import ProjectFS
+
 
 class TestProjectFS(unittest.TestCase):
     def setUp(self):
@@ -45,6 +46,7 @@ class TestProjectFS(unittest.TestCase):
     def test_read_nonexistent_file(self):
         with self.assertRaises(FileNotFoundError):
             self.fs.read("nonexistent_file.txt")
+
 
 if __name__ == "__main__":
     unittest.main()

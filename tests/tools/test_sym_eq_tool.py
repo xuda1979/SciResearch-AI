@@ -1,5 +1,7 @@
 import pytest
+
 from packages.sciresearch_tools.sym_eq_tool import SymEqTool
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
@@ -17,6 +19,7 @@ async def test_sym_eq_tool_positive_cases(expr1, expr2, expected):
     tool = SymEqTool()
     output = await tool(expr1, expr2)
     assert output == expected
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(

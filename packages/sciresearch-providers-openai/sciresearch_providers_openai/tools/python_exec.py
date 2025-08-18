@@ -1,5 +1,9 @@
 from __future__ import annotations
-import contextlib, io, traceback
+
+import contextlib
+import io
+import traceback
+
 
 def run_user_code(code: str) -> str:
     # very lightweight sandbox (no imports filtering here; meant for local, trusted use only)

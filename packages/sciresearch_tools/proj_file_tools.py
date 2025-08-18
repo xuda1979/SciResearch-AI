@@ -1,6 +1,7 @@
 import os
 from typing import List
 
+
 class WriteProjectFileTool:
     """A tool for writing to project files."""
 
@@ -29,6 +30,7 @@ class WriteProjectFileTool:
             return f"Successfully wrote to {filepath}"
         except Exception as e:
             return f"Error writing to file: {e}"
+
 
 class ListProjectFilesTool:
     """A tool for listing project files."""

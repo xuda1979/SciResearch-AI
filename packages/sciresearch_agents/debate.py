@@ -1,5 +1,7 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from .protocols import Strategy
+
 
 class Debate(Strategy):
     def plan(self, problem: str) -> List[str]:
