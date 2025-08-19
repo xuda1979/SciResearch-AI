@@ -26,7 +26,7 @@ Recent systems (e.g., OpenAI's reasoning models and Google's 'deep thinking' res
     - `write_project_file(relative_path, content)` — create/edit files
     - `list_project_files(relative_path)` — list files in a subfolder
 - **Configurable budgets:** iterations, TTC samples, time budget, parallelism
-- **Automatic provider selection** based on `--model` so switching between OpenAI and OSS is just a flag change
+- **Automatic provider selection** based on `--model`; `--provider` defaults to `auto` so switching between OpenAI and OSS is just a flag change
 - **Offline** Mock provider for tests
 
 ---
