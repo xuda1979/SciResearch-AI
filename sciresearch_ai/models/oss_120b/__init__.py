@@ -7,13 +7,6 @@ try:  # pragma: no cover - optional dependency
 except Exception:  # transformers may be missing during tests
     AutoModelForCausalLM = AutoTokenizer = None  # type: ignore
 
-try:  # pragma: no cover - optional dependency
-    from gpt_oss.tokenizer import get_tokenizer as _gpt_tokenizer
-    from gpt_oss.torch.model import TokenGenerator as _TorchGenerator
-except Exception:  # gpt_oss or torch may be missing
-    _gpt_tokenizer = None
-    _TorchGenerator = None
-
 DEFAULT_MODEL_NAME = "openai/oss-120b"
 
 
@@ -61,26 +54,3 @@ def load_model(
                     f"Unable to move model to device {device!r}"
                 ) from exc
     return model, tokenizer
-
-
-def load_local_generator(checkpoint: str) -> Tuple[object, object]:
-    """Load the tokenizer and token generator from the vendored ``gpt_oss``.
-
-    Parameters
-    ----------
-    checkpoint:
-        Path to a local SafeTensors checkpoint for the OSS 120B model.
-
-    Returns
-    -------
-    (generator, tokenizer):
-        Instances suitable for token-by-token generation using the
-        official ``gpt_oss`` implementation.
-    """
-    if _gpt_tokenizer is None or _TorchGenerator is None:
-        raise RuntimeError(
-            "gpt_oss with torch backend is required to load the local generator"
-        )
-    tokenizer = _gpt_tokenizer()
-    generator = _TorchGenerator(checkpoint)
-    return generator, tokenizer
