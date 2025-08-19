@@ -1,5 +1,7 @@
 import pytest
-from packages.sciresearch_agents.registry import get_strategy, STRATEGIES
+
+from packages.sciresearch_agents.registry import STRATEGIES, get_strategy
+
 
 @pytest.mark.parametrize("strategy_name", STRATEGIES.keys())
 def test_strategy_contract(strategy_name):
@@ -32,4 +34,6 @@ def test_strategy_contract(strategy_name):
     # Test select
     selected = strategy.select(scores)
     assert isinstance(selected, str)
-    assert selected in expansions, "Selected expansion must be one of the original expansions"
+    assert (
+        selected in expansions
+    ), "Selected expansion must be one of the original expansions"

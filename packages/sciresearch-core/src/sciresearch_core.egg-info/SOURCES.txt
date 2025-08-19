@@ -1,8 +1,0 @@
-pyproject.toml
-src/sciresearch_core/__init__.py
-src/sciresearch_core/protocols.py
-src/sciresearch_core/types.py
-src/sciresearch_core.egg-info/PKG-INFO
-src/sciresearch_core.egg-info/SOURCES.txt
-src/sciresearch_core.egg-info/dependency_links.txt
-src/sciresearch_core.egg-info/top_level.txt

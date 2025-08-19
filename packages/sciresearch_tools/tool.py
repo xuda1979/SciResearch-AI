@@ -1,4 +1,5 @@
-from typing import Protocol, Any, Awaitable
+from typing import Any, Awaitable, Protocol
+
 
 class Tool(Protocol):
     """A protocol for tools that can be called by the agent."""

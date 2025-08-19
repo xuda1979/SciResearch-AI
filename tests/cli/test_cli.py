@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import subprocess
 import sys
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from sciresearch_cli.main import main
+from sciresearch_ai.main import main
+
 
 def test_help_message():
     """Check that the --help message is printed and contains expected text."""
@@ -18,12 +20,16 @@ def test_help_message():
     assert "run" in result.stdout
     assert "test-openai" in result.stdout
 
+
 def test_run_mocked():
     """Test the 'run' command with mocks to ensure correct components are called."""
-    with patch("sciresearch_cli.main.Project") as mock_project_class, \
-         patch("sciresearch_cli.main.build_provider") as mock_build_provider, \
-         patch("sciresearch_cli.main.Orchestrator") as mock_orchestrator_class, \
-         patch("sciresearch_cli.main.RunConfig") as mock_run_config_class:
+    with patch("sciresearch_ai.main.Project") as mock_project_class, patch(
+        "sciresearch_ai.main.build_provider"
+    ) as mock_build_provider, patch(
+        "sciresearch_ai.orchestrator.Orchestrator"
+    ) as mock_orchestrator_class, patch(
+        "sciresearch_ai.main.RunConfig"
+    ) as mock_run_config_class:
 
         # Arrange
         mock_project_instance = MagicMock()
@@ -39,13 +45,19 @@ def test_run_mocked():
         mock_run_config_class.return_value = mock_run_config_instance
 
         # Act
-        main([
-            "run",
-            "--project", "test_project",
-            "--provider", "mock",
-            "--max-iterations", "3",
-            "--budget-usd", "1.23",
-        ])
+        main(
+            [
+                "run",
+                "--project",
+                "test_project",
+                "--provider",
+                "mock",
+                "--max-iterations",
+                "3",
+                "--budget-usd",
+                "1.23",
+            ]
+        )
 
         # Assert
         mock_project_class.assert_called_once_with("test_project")

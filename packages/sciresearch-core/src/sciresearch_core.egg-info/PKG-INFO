@@ -1,7 +1,0 @@
-Metadata-Version: 2.4
-Name: sciresearch-core
-Version: 0.0.1
-Summary: Core contracts for the SciResearch AI project.
-Classifier: Programming Language :: Python :: 3
-Classifier: Operating System :: OS Independent
-Requires-Python: >=3.8

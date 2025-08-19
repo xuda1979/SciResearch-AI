@@ -161,8 +161,10 @@ def setup_fake_model(monkeypatch, messages_seq):
         def process(self, tok):
             self.messages = messages_seq.pop(0)
 
-    monkeypatch.setattr(op, "load_harmony_encoding", lambda _: FakeEncoding())
-    monkeypatch.setattr(op, "StreamableParser", FakeParser)
+    import openai_harmony as oh
+
+    monkeypatch.setattr(oh, "load_harmony_encoding", lambda _: FakeEncoding())
+    monkeypatch.setattr(oh, "StreamableParser", FakeParser)
     monkeypatch.setattr(
         op,
         "_setup_transformers",

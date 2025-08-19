@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 import os
 from pathlib import Path
 from typing import List
+
 
 class ProjectFS:
     def __init__(self, project_name: str, projects_dir: Path = Path("./projects")):
@@ -17,7 +19,15 @@ class ProjectFS:
         self.logs_dir = self.root / "logs"
         self.rev_dir = self.root / "revisions"
 
-        for d in [self.paper_dir, self.fig_dir, self.code_dir, self.data_dir, self.notes_dir, self.logs_dir, self.rev_dir]:
+        for d in [
+            self.paper_dir,
+            self.fig_dir,
+            self.code_dir,
+            self.data_dir,
+            self.notes_dir,
+            self.logs_dir,
+            self.rev_dir,
+        ]:
             d.mkdir(exist_ok=True)
 
     def read(self, file_path: str) -> str:

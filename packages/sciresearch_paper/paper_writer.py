@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 import datetime
 import os
 import shutil
 from pathlib import Path
 
 from .project_fs import ProjectFS
+
 
 class PaperWriter:
     def __init__(self, fs: ProjectFS):
@@ -27,6 +29,7 @@ class PaperWriter:
         snap_path = self.fs.rev_dir / snap_name
         shutil.copy2(self.draft_path, snap_path)
         return snap_path
+
 
 DEFAULT_TEX = r"""\documentclass{article}
 \usepackage{graphicx}

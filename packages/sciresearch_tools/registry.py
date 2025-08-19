@@ -1,14 +1,18 @@
-from typing import NamedTuple, Type, List
-from .tool import Tool
+from typing import List, NamedTuple, Type
+
+from .proj_file_tools import ListProjectFilesTool, WriteProjectFileTool
 from .python_exec_tool import PythonExecTool
 from .sym_eq_tool import SymEqTool
-from .proj_file_tools import WriteProjectFileTool, ListProjectFilesTool
+from .tool import Tool
+
 
 class ToolSpec(NamedTuple):
     """A specification for a tool."""
+
     name: str
     description: str
     tool_class: Type[Tool]
+
 
 ALL_TOOLS: List[ToolSpec] = [
     ToolSpec(
@@ -32,6 +36,7 @@ ALL_TOOLS: List[ToolSpec] = [
         tool_class=ListProjectFilesTool,
     ),
 ]
+
 
 def get_tool_spec(name: str) -> ToolSpec | None:
     """Get a tool spec by name."""

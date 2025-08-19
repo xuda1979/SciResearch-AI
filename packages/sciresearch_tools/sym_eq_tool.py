@@ -1,5 +1,7 @@
-from sympy import sympify, simplify
 from typing import Any
+
+from sympy import simplify, sympify
+
 
 class SymEqTool:
     """A tool for checking symbolic equality of two expressions."""

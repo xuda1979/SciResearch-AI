@@ -1,5 +1,7 @@
 from __future__ import annotations
-from sympy import sympify, Eq, simplify
+
+from sympy import Eq, simplify, sympify
+
 
 def check_symbolic_equality(expr1: str, expr2: str) -> bool:
     try:

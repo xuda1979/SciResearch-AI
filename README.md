@@ -15,7 +15,8 @@ Recent systems (e.g., OpenAI's reasoning models and Google's 'deep thinking' res
   - Self-consistency (Best-of-N) voting
   - **Budgeted Adaptive Deliberation (BAD)**: *new* margin-based early stop for TTC
   - Multi-agent **Debate → Consensus**
-  - **Critique → Revise** reflection loop
+  - **Critique → Revise** reflection loop with a multi-pass checklist (format, spelling, citations, innovation)
+- **Automatic validation** after each iteration: citation cross-checks, novelty keywords, and pdflatex compilation
 - **Human-in-the-loop:** inject guidance or stop after each iteration
 - **OpenAI Responses API** integration with:
   - Optional GPT‑5 **Code Interpreter** tool (`--enable-code-interpreter`)
@@ -25,6 +26,7 @@ Recent systems (e.g., OpenAI's reasoning models and Google's 'deep thinking' res
     - `write_project_file(relative_path, content)` — create/edit files
     - `list_project_files(relative_path)` — list files in a subfolder
 - **Configurable budgets:** iterations, TTC samples, time budget, parallelism
+- **Automatic provider selection** based on `--model`; `--provider` defaults to `auto` so switching between OpenAI and OSS is just a flag change
 - **Offline** Mock provider for tests
 
 ---
@@ -54,16 +56,24 @@ python -m sciresearch_ai.main new --name "my_paper" --root .
 # Offline smoke run (mock LLM)
 python -m sciresearch_ai.main run --project .\projects\my_paper --provider mock --max-iterations 2
 
-# Real run (OpenAI)
+# Real run (OpenAI o3)
 python -m sciresearch_ai.main run --project .\projects\my_paper `
-  --provider openai `
-  --model gpt-5-chat-latest `
+  --model o3-mini `
   --max-iterations 5 `
   --samples-per-query 6 `
   --time-budget-sec 1800 `
   --reasoning-effort high `
   --temperature 0.2 --top_p 0.9 --max-output-tokens 2000 `
   --enable-code-interpreter   # optional tool
+
+# Local OSS run (stub backend)
+OSS_PROVIDER_BACKEND=stub python -m sciresearch_ai.main run --project .\projects\my_paper \
+  --model oss-120b --max-iterations 1 --samples-per-query 1 --no-interactive
+
+# The stub mode runs entirely offline and skips Harmony vocab downloads.
+
+# Swap models by editing `--model`; the CLI infers the provider automatically.
+# You can omit `--provider` because it defaults to `auto`.
 
 # Quick check that your OpenAI API key works
 python -m sciresearch_ai.main test-openai --model gpt-4o-mini --reasoning-effort none
@@ -234,7 +244,7 @@ allows local inference and optional tools such as web search (via the
 
 ```bash
 python -m sciresearch_ai.main run --project ./projects/my_paper \
-  --provider oss --enable-browser --enable-python --max-iterations 2
+  --model oss-120b --enable-browser --enable-python --max-iterations 2
 ```
 
 `--enable-browser` attaches a lightweight web-search tool (via Exa), and

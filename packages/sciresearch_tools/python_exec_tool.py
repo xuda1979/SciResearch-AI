@@ -1,8 +1,10 @@
 import asyncio
-import docker
 import io
 import tarfile
 from typing import Any
+
+import docker
+
 
 class PythonExecTool:
     """A tool for executing Python code in a sandboxed environment."""
@@ -56,8 +58,7 @@ class PythonExecTool:
             container.start()
             container.put_archive(path="/tmp", data=tarstream.read())
             exec_result = container.exec_run(
-                f"python /tmp/{script_name}",
-                timeout=self.timeout
+                f"python /tmp/{script_name}", timeout=self.timeout
             )
             output = exec_result.output.decode("utf-8")
         except Exception as e:

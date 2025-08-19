@@ -2,13 +2,20 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, List
 
-CRITIC_SYS = "You are a meticulous reviewer. Identify errors, missing citations, and unclear logic. Propose concrete fixes."
+CHECKLIST = (
+    "Ensure the draft follows academic conventions: spelling/typo-free writing, grammar, LaTeX formatting that compiles under pdflatex, "
+    "all citations appear in the bibliography, novelty and innovation are highlighted, and the text maintains a clear logical flow."
+)
+CRITIC_SYS = (
+    "You are a meticulous reviewer. Follow the checklist strictly and propose concrete fixes.\n"
+    f"CHECKLIST: {CHECKLIST}"
+)
 
 
 def critique_and_revise(
     provider_generate: Callable[[str, int], List[str]],
     draft: str,
-    passes: int = 2,
+    passes: int = 3,
 ) -> Dict[str, Any]:
     history: List[str] = []
     current = draft

@@ -59,11 +59,10 @@ class Orchestrator:
             )
             reviewed = debate_out["consensus"]
 
-            # 4) Reflection: critique and revise a draft methods section
+            # 4) Reflection: critique and revise a draft methods section with three passes
             refl = reflection.critique_and_revise(
                 lambda p, n: self._gen(p, n),
                 draft=f"Methods draft (start from this experiment):\n{experiment}",
-                passes=1,
             )
             methods = refl["final"]
 
@@ -72,10 +71,10 @@ class Orchestrator:
                 tex = f.read()
             new_tex = tex.replace("TBD.", methods[:2000] + "\nTBD.")
             pm.autosave(new_tex)
-            ok = pm.compile_pdf()
+            ok = pm.validate_paper()
             pm.log(
                 f"Iter {state['iter']}: plan, experiment, review added. "
-                f"PDF compile {'succeeded' if ok else 'failed'}"
+                f"Validation {'succeeded' if ok else 'failed'}"
             )
 
             # 6) Save state
@@ -98,9 +97,9 @@ class Orchestrator:
                     with open(pm.draft_path, "a", encoding="utf-8") as f:
                         f.write("\n% HUMAN NOTE: " + user + "\n")
                     pm.autosave(open(pm.draft_path, "r", encoding="utf-8").read())
-                    ok = pm.compile_pdf()
+                    ok = pm.validate_paper()
                     pm.log(
-                        f"HITL note added. PDF compile {'succeeded' if ok else 'failed'}"
+                        f"HITL note added. Validation {'succeeded' if ok else 'failed'}"
                     )
                 if self.stop_flag:
                     state["status"] = "stopped_by_user"
