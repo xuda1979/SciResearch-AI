@@ -1,9 +1,0 @@
-setup.py
-sciresearch_cli/__init__.py
-sciresearch_cli/main.py
-sciresearch_cli.egg-info/PKG-INFO
-sciresearch_cli.egg-info/SOURCES.txt
-sciresearch_cli.egg-info/dependency_links.txt
-sciresearch_cli.egg-info/entry_points.txt
-sciresearch_cli.egg-info/requires.txt
-sciresearch_cli.egg-info/top_level.txt
