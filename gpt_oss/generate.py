@@ -26,17 +26,31 @@ def main(args):
             from gpt_oss.vllm.token_generator import TokenGenerator as VLLMGenerator
 
             generator = VLLMGenerator(args.checkpoint, tensor_parallel_size=2)
+        case "speculative":
+            from gpt_oss.torch.speculative import SpeculativeTokenGenerator
+            from gpt_oss.torch.utils import init_distributed
+
+            device = init_distributed()
+            generator = SpeculativeTokenGenerator(
+                args.checkpoint, args.draft_checkpoint, device=device
+            )
         case _:
             raise ValueError(f"Invalid backend: {args.backend}")
 
     tokenizer = get_tokenizer()
     tokens = tokenizer.encode(args.prompt)
+    generate_kwargs = {
+        "temperature": args.temperature,
+        "max_tokens": args.limit,
+        "return_logprobs": True,
+    }
+    if args.backend == "speculative":
+        generate_kwargs["gamma"] = args.gamma
+
     for token, logprob in generator.generate(
         tokens,
         stop_tokens=[tokenizer.eot_token],
-        temperature=args.temperature,
-        max_tokens=args.limit,
-        return_logprobs=True,
+        **generate_kwargs,
     ):
         tokens.append(token)
         decoded_token = tokenizer.decode([token])
@@ -50,6 +64,13 @@ if __name__ == "__main__":
         metavar="FILE",
         type=str,
         help="Path to the SafeTensors checkpoint",
+    )
+    parser.add_argument(
+        "--draft_checkpoint",
+        metavar="FILE",
+        type=str,
+        default=None,
+        help="Path to the draft model's SafeTensors checkpoint (for speculative decoding)",
     )
     parser.add_argument(
         "-p",
@@ -76,12 +97,20 @@ if __name__ == "__main__":
         help="Limit on the number of tokens (0 to disable)",
     )
     parser.add_argument(
+        "-g",
+        "--gamma",
+        metavar="GAMMA",
+        type=int,
+        default=4,
+        help="Number of draft tokens for speculative decoding",
+    )
+    parser.add_argument(
         "-b",
         "--backend",
         metavar="BACKEND",
         type=str,
         default="torch",
-        choices=["triton", "torch", "vllm"],
+        choices=["triton", "torch", "vllm", "speculative"],
         help="Inference backend",
     )
     args = parser.parse_args()
