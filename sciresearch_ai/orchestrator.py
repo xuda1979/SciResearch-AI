@@ -4,6 +4,7 @@ import time
 
 from .config import RunConfig
 from .inference import debate, reflection, ttc
+from .paper.parser import parse_response
 
 
 class Orchestrator:
@@ -69,7 +70,8 @@ class Orchestrator:
             # 5) Update LaTeX and autosave
             with open(pm.draft_path, "r", encoding="utf-8") as f:
                 tex = f.read()
-            new_tex = tex.replace("TBD.", methods[:2000] + "\nTBD.")
+            parsed_methods = parse_response(methods[:2000])
+            new_tex = tex.replace("TBD.", parsed_methods + "\nTBD.")
             pm.autosave(new_tex)
             ok = pm.validate_paper()
             pm.log(
