@@ -1,0 +1,19 @@
+\documentclass{article}
+\usepackage{hyperref}
+\title{Counterparty Models with Verifiable Non-Collusion}
+\author{SciResearch AI Team}
+\date{\today}
+\begin{document}
+\maketitle
+\begin{abstract}
+\textbf{Counterparty Models with Verifiable Non-Collusion (CNCM)} are a radical approach to reduce hallucinations and biases in language models by running multiple specialised models as adversarial partners: an Advocate, a Skeptic, and a Judge. Each model plays a role in producing, challenging and aggregating answers, while cryptographic transcripts prevent collusion.
+\end{abstract}
+\section{Introduction}
+Large language models often lack self-critical mechanisms. CNCM proposes a multi-agent framework where an Advocate proposes answers, a Skeptic produces falsifiers, and a Judge aggregates under proper scoring rules. The system ensures non-collusion by isolating the agents and using cryptographic transcripts.
+\section{Method}
+The Advocate is tasked with maximising the utility of correct answers. The Skeptic acts adversarially to minimise this utility by producing counterexamples and contradictions. The Judge employs proper scoring rules to reward or penalise each agent based on correctness. To prevent collusion, each agent runs on different architectures or data slices, and transcripts are hashed and signed.
+\section{Implementation}
+A prototype can be built by pairing different models or fine-tuned versions of a base model. The Advocate and Skeptic generate claims and counterclaims which are stored as transcripts with signatures. The Judge, implemented as a separate model or algorithm, resolves conflicts and produces a final answer.
+\section{Conclusion}
+Counterparty Models with Verifiable Non-Collusion provide a way to harness the diversity of models and ensure that answers are challenged and verified before being delivered.
+\end{document}
