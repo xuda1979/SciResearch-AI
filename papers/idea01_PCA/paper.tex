@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\title{Proof-Carrying Answers and Property-Based Self-Fuzzing}
+\author{Research Team}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This paper introduces the concept of Proof-Carrying Answers (PCA) combined with property-based self-fuzzing as a means to improve reliability and verifiability of large language model outputs. PCA requires that each generated answer includes a machine-checkable proof or verification script. Property-based self-fuzzing uses counterexample generators to test claims by systematically searching for violations.
+\end{abstract}
+
+\section{Introduction}
+Modern LLMs suffer from hallucination and unverifiable statements. PCA addresses this by packaging answers with proof artifacts, while self-fuzzing generates and tests counterexamples.
+
+\section{Method}
+We describe the technique: for each claim, produce code that checks the claim and attempts to find counterexamples. The code is executed in a sandbox environment to ensure safety.
+
+\section{Implementation}
+The implementation is provided in \texttt{code.py}, which imports the \texttt{sciresearch\_ai} module to leverage existing utilities and demonstrates a simple example of generating a proof-carrying answer.
+
+\end{document}
