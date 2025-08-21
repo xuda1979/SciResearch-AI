@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\title{Causal Audit Trails for Transparent LLM Reasoning}
+\author{Research Team}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This paper explores the concept of Causal Audit Trails (CAT) as a mechanism to improve transparency and trust in large language model outputs. CAT records a causal directed acyclic graph for each claim, capturing which sources, tools, prompts, and code paths influenced the generated content.
+\end{abstract}
+
+\section{Introduction}
+Modern language models often provide answers without explicit traceability. In regulated domains such as finance or medicine, understanding the provenance of information is critical.
+
+\section{Method}
+We propose to build a causal DAG of an answer: each node corresponds to a source or operation, and edges encode causal relationships with digests and responsibility weights. By emitting a CAT alongside answers, users and auditors can verify how each piece of information was derived.
+
+\section{Implementation}
+Our implementation leverages the \texttt{sciresearch\_ai} module. The following Python script demonstrates constructing a simple causal audit trail using the module.
+
+\end{document}
