@@ -1,0 +1,31 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb}
+
+\title{Semantic-Hash Lattice Memory (SHL-Mem)}
+\author{Researcher}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Semantic-Hash Lattice Memory (SHL-Mem) is a proposed long-context memory
+architecture that uses multiple locality-sensitive semantic hashes to organize
+and retrieve information from very long sequences. By mapping spans of the
+input into hash buckets along several semantic dimensions (e.g., entities,
+relations, time), SHL-Mem allows efficient retrieval via lattice joins.
+
+\section{Method}
+Each span of tokens is hashed according to several functions corresponding
+to different semantic views. The resulting hash codes form a lattice of sets.
+Queries traverse the lattice by intersecting hash buckets that share
+similar semantic content, providing a small candidate set for attention.
+
+\section{Implementation}
+In our demonstration code, we build a simplified version of SHL-Mem.
+We generate random hash codes for spans and compute intersections to
+approximate retrieval. The \texttt{sciresearch\_ai} module is imported
+for versioning.
+
+\end{document}
