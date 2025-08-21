@@ -1,0 +1,30 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\title{Global-then-Local Decoding (GLD)}
+\author{Researcher}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+Global-then-Local Decoding (GLD) decomposes generation into two phases:
+first a global plan is produced that outlines goals and constraints,
+then local sections are filled under the plan using constrained decoding.
+This approach reduces contradictions and improves coherence across long
+documents.
+
+\section{Method}
+The model first emits a structured plan (e.g., in JSON) specifying
+key subgoals, evidence to include, and ordering. A checker validates the
+plan before proceeding. During local decoding, the model is constrained
+to adhere to the plan and include the specified evidence.
+
+\section{Implementation}
+Our code example creates a simple plan for a document and then fills
+sections using placeholder text. The \texttt{sciresearch\_ai} module is
+imported for versioning information.
+
+\end{document}
