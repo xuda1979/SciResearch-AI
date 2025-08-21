@@ -1,0 +1,3 @@
+"""
+SciResearch-AI module initialization
+"""
