@@ -6,14 +6,28 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Entropy-Thermostat Decoding (ETD) is a decoding strategy for language models that regulates the entropy of output tokens, aiming to reduce verbosity and stabilize reasoning depth. It dynamically adjusts the sampling temperature based on a target entropy schedule.
+Entropy-Thermostat Decoding (ETD) regulates the entropy of output tokens
+to reduce verbosity and stabilise reasoning depth. It dynamically
+adjusts the sampling temperature based on a target entropy schedule.
 \end{abstract}
 \section{Introduction}
-Long-form answers can suffer from rambling and inconsistent reasoning depths. ETD introduces a target entropy schedule over the answer; when the model's output entropy deviates from this schedule, the decoding temperature is adjusted to encourage more or less exploration.
+Long-form answers can suffer from rambling and inconsistent reasoning
+depths. ETD introduces a target entropy schedule over the answer; when
+the model's output entropy deviates from this schedule, the decoding
+temperature is adjusted to encourage more or less exploration.
 \section{Method}
-The algorithm monitors the entropy of the token probability distribution during generation. If entropy spikes without new subgoals, the temperature is lowered to reduce randomness. If entropy is too low while the model is stuck, the temperature is increased. This thermostat approach keeps the generation aligned with a desired entropy profile.
+The algorithm monitors the entropy of the token probability
+distribution during generation. If entropy spikes without new
+subgoals, the temperature is lowered to reduce randomness. If entropy
+is too low while the model is stuck, the temperature is increased. This
+thermostat approach keeps the generation aligned with a desired entropy
+profile.
 \section{Implementation}
-A prototype can be implemented by wrapping the model's sampling loop. The wrapper computes the entropy at each step and applies a function to adjust the temperature. The schedule may be linear or piecewise, with optional checkpoints for summarization.
+A prototype wraps the model's sampling loop. The wrapper computes the
+entropy at each step and applies a function to adjust the temperature.
+The schedule may be linear or piecewise, with optional checkpoints for
+summarisation.
 \section{Conclusion}
-ETD provides a simple yet effective control mechanism to manage verbosity and maintain focus during generation, improving clarity and efficiency.
+ETD provides a simple control mechanism to manage verbosity and
+maintain focus during generation, improving clarity and efficiency.
 \end{document}

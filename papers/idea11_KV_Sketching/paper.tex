@@ -66,4 +66,7 @@ To evaluate KV\-Sketching one can monitor:
 \section{Failure modes}
 Sketching introduces approximation error that can accumulate across layers.  If the uncertainty predictor underestimates error, the model may hallucinate or drop critical context.  Mitigation strategies include conservative uncertainty thresholds and periodic rehydration checkpoints.
 
+\section{Conclusion}
+KV-Sketching offers a path to multi-million-token contexts by trading exactness for controlled approximation, enabling long-range reasoning on modest hardware.
+
 \end{document}

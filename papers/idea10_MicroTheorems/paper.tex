@@ -1,17 +1,45 @@
 \documentclass{article}
-\title{Idea 10: Knowledge Fossilization via Micro-Theorems}
-\author{}
-\date{}
+\title{Knowledge Fossilization via Micro-Theorems}
+\author{Research Team}
+\date{\today}
 \begin{document}
 \maketitle
 
+\begin{abstract}
+Micro-theorems encode domain facts as small verifiable units. By
+embedding tests or proofs with each theorem, models can preserve
+critical knowledge across updates and avoid regressions.
+\end{abstract}
+
 \section{Introduction}
-Large language models are prone to forgetting or misrepresenting established facts when updated or fine-tuned. To counteract this drift, we propose knowledge fossilization via micro-theorems. Each important domain fact is formalized as a small theorem with an accompanying test or proof. During generation, these micro-theorems can be referenced or imported, ensuring that critical relationships remain consistent across model updates.
+Large language models are prone to forgetting or misrepresenting
+established facts when updated or fine-tuned. To counteract this drift,
+we propose knowledge fossilisation via micro-theorems. Each important
+domain fact is formalised as a small theorem with an accompanying test
+or proof. During generation, these micro-theorems can be referenced or
+imported, ensuring that critical relationships remain consistent across
+model updates.
 
 \section{Method}
-A micro-theorem captures a factual relationship (e.g., ``ICD--10 code X corresponds to condition Y'') and includes a short proof or verification function. By organizing the knowledge base into such units, we can enforce that any output using these facts must pass the associated tests. Micro-theorems can be versioned and expired when the underlying fact changes.
+A micro-theorem captures a factual relationship (e.g., ``ICD--10 code X
+corresponds to condition Y'') and includes a short proof or
+verification function. By organising the knowledge base into such
+units, we can enforce that any output using these facts must pass the
+associated tests. Micro-theorems can be versioned and expired when the
+underlying fact changes.
 
 \section{Implementation}
-To implement this idea, we build a library of micro-theorems as Python modules with unit tests. The language model is restricted to import from this library when generating answers in regulated domains. A constrained decoding mechanism ensures that references to domain knowledge call the corresponding micro-theorem functions. If a generated statement fails its test, the model revises the statement or abstains.
+To implement this idea, we build a library of micro-theorems as Python
+modules with unit tests. The language model is restricted to import from
+this library when generating answers in regulated domains. A
+constrained decoding mechanism ensures that references to domain
+knowledge call the corresponding micro-theorem functions. If a
+generated statement fails its test, the model revises the statement or
+abstains.
+
+\section{Conclusion}
+Organising factual relationships into micro-theorems supplies a durable
+scaffold that constrains model outputs and simplifies auditing for
+drift.
 
 \end{document}

@@ -8,16 +8,29 @@
 \maketitle
 
 \begin{abstract}
-This paper explores the concept of Causal Audit Trails (CAT) as a mechanism to improve transparency and trust in large language model outputs. CAT records a causal directed acyclic graph for each claim, capturing which sources, tools, prompts, and code paths influenced the generated content.
+Causal Audit Trails (CAT) improve transparency and trust in language
+model outputs by recording a directed acyclic graph of the sources,
+tools, prompts, and code paths that influence each claim.
 \end{abstract}
 
 \section{Introduction}
-Modern language models often provide answers without explicit traceability. In regulated domains such as finance or medicine, understanding the provenance of information is critical.
+Modern language models often provide answers without explicit
+traceability. In regulated domains such as finance or medicine,
+understanding the provenance of information is critical.
 
 \section{Method}
-We propose to build a causal DAG of an answer: each node corresponds to a source or operation, and edges encode causal relationships with digests and responsibility weights. By emitting a CAT alongside answers, users and auditors can verify how each piece of information was derived.
+We build a causal DAG for an answer where each node corresponds to a
+source or operation and edges encode causal relationships with digests
+and responsibility weights. By emitting a CAT alongside answers, users
+and auditors can verify how each piece of information was derived.
 
 \section{Implementation}
-Our implementation leverages the \texttt{sciresearch\_ai} module. The following Python script demonstrates constructing a simple causal audit trail using the module.
+The accompanying \texttt{code.py} script constructs a toy causal audit
+trail using the \texttt{sciresearch\_ai} module.
+
+\section{Conclusion}
+CATs provide a practical foundation for accountability, enabling
+external verification of an answer's lineage and discouraging
+unsupported claims.
 
 \end{document}

@@ -6,14 +6,31 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Deterministic Shadow-OS for Agents (DSOS) is a method to make AI agents safer and more reliable when interacting with operating systems and web interfaces. DSOS forces the agent to produce a deterministic intention log of actions to be executed in a sandbox, enabling human review and rollback before committing changes.
+Deterministic Shadow-OS for Agents (DSOS) makes AI agents safer when
+interacting with operating systems and web interfaces. DSOS forces the
+agent to produce a deterministic intention log of actions to be
+executed in a sandbox, enabling human review and rollback before
+committing changes.
 \end{abstract}
 \section{Introduction}
-Tool-using agents often struggle with unpredictable UI elements and side effects. DSOS introduces a shadow environment that records planned filesystem diffs, HTTP actions, and UI selectors. Actions are first replayed deterministically in this environment and only committed upon review.
+Tool-using agents often struggle with unpredictable UI elements and
+side effects. DSOS introduces a shadow environment that records planned
+filesystem diffs, HTTP actions, and UI selectors. Actions are first
+replayed deterministically in this environment and only committed upon
+review.
 \section{Method}
-DSOS consists of three steps: (1) the agent writes a plan of actions with semantic selectors; (2) the plan is executed in a deterministic, headless shadow OS or browser, producing a diff and logs; (3) a verifier or human approves the diff before real execution. This ensures actions are reversible and auditable.
+DSOS consists of three steps: (1) the agent writes a plan of actions
+with semantic selectors; (2) the plan is executed in a deterministic,
+headless shadow OS or browser, producing a diff and logs; (3) a
+verifier or human approves the diff before real execution. This ensures
+actions are reversible and auditable.
 \section{Implementation}
-A minimal prototype uses a headless browser and file system to simulate actions. The agent's plan can be represented as JSON. After simulation, the diff is presented for approval. Only upon approval does the agent execute the actions on the real system.
+A minimal prototype uses a headless browser and file system to simulate
+actions. The agent's plan can be represented as JSON. After simulation,
+the diff is presented for approval. Only upon approval does the agent
+execute the actions on the real system.
 \section{Conclusion}
-DSOS improves agent reliability by separating planning, verification, and execution stages, reducing unintended side effects and allowing human oversight.
+DSOS improves agent reliability by separating planning, verification,
+and execution stages, reducing unintended side effects and allowing
+human oversight.
 \end{document}
