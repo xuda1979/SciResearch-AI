@@ -1,0 +1,496 @@
+\RequirePackage{filecontents}
+\begin{filecontents*}{refs.bib}
+@article{lu2024aiscientist,
+  title={The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery},
+  author={Lu, Chris and Lu, Cong and Lange, Robert Tjarko and Foerster, Jakob and Clune, Jeff and Ha, David},
+  year={2024},
+  eprint={2408.06292},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG}
+}
+@inproceedings{yao2023react,
+  title={ReAct: Synergizing Reasoning and Acting in Language Models},
+  author={Yao, Shunyu and Zhao, Jeffrey and Yu, Dian and Du, Nan and Shafran, Izhak and Narasimhan, Karthik and Cao, Yuan},
+  booktitle={ICLR},
+  year={2023}
+}
+@article{schick2023toolformer,
+  title={Toolformer: Language Models Can Teach Themselves to Use Tools},
+  author={Schick, Timo and Dwivedi-Yu, Jane and Dess{\`i}, Roberto and Raileanu, Roberta and Lomeli, Maria and Hambro, Eric and Zettlemoyer, Luke and Cancedda, Nicola and Scialom, Thomas},
+  year={2023},
+  eprint={2302.04761},
+  archivePrefix={arXiv}
+}
+@article{wang2022selfconsistency,
+  title={Self-Consistency Improves Chain of Thought Reasoning in Language Models},
+  author={Wang, Xuezhi and Wei, Jason and Schuurmans, Dale and Le, Quoc and Chi, Ed H. and Narang, Sharan and Zhou, Denny},
+  year={2022},
+  eprint={2203.11171},
+  archivePrefix={arXiv}
+}
+@article{yao2023tot,
+  title={Tree of Thoughts: Deliberate Problem Solving with Large Language Models},
+  author={Yao, Shunyu and Yu, Dian and Zhao, Jeffrey and Shafran, Izhak and Griffiths, Thomas L. and Cao, Yuan and Narasimhan, Karthik},
+  year={2023},
+  eprint={2305.10601},
+  archivePrefix={arXiv}
+}
+@article{wang2023voyager,
+  title={Voyager: An Open-Ended Embodied Agent with Large Language Models},
+  author={Wang, Guanzhi and Xie, Yuqi and Jiang, Yunfan and Mandlekar, Ajay and Xiao, Chaowei and Zhu, Yuke and Fan, Linxi and Anandkumar, Anima},
+  year={2023},
+  eprint={2305.16291},
+  archivePrefix={arXiv}
+}
+@online{k8sAutoscaler,
+  title={Node Autoscaling (Cluster Autoscaler)},
+  year={2024},
+  url={https://kubernetes.io/docs/concepts/cluster-administration/node-autoscaling/}
+}
+@online{kueueDocs,
+  title={Kueue: Kubernetes-native Job Queueing},
+  year={2025},
+  url={https://kueue.sigs.k8s.io/}
+}
+@online{argoDocs,
+  title={Argo Workflows: The Workflow Engine for Kubernetes},
+  year={2025},
+  url={https://argo-workflows.readthedocs.io/en/latest/}
+}
+@online{mlflowTracking,
+  title={MLflow Tracking},
+  year={2025},
+  url={https://mlflow.org/docs/latest/ml/tracking/}
+}
+@online{minioS3,
+  title={MinIO: S3 API Compatibility},
+  year={2025},
+  url={https://docs.min.io/community/minio-object-store/reference/s3-api-compatibility.html}
+}
+@online{semanticscholarAPI,
+  title={Semantic Scholar Academic Graph API},
+  year={2025},
+  url={https://api.semanticscholar.org/api-docs}
+}
+@online{crossrefAPI,
+  title={Crossref REST API},
+  year={2025},
+  url={https://www.crossref.org/documentation/retrieve-metadata/rest-api/}
+}
+@online{arxivAPI,
+  title={arXiv API Access},
+  year={2025},
+  url={https://info.arxiv.org/help/api/index.html}
+}
+@online{podSecurityStandards,
+  title={Kubernetes Pod Security Standards},
+  year={2025},
+  url={https://kubernetes.io/docs/concepts/security/pod-security-standards/}
+}
+@online{networkPolicies,
+  title={Kubernetes Network Policies},
+  year={2024},
+  url={https://kubernetes.io/docs/concepts/services-networking/network-policies/}
+}
+@online{gvisor,
+  title={gVisor: Application Kernel for Containers},
+  year={2025},
+  url={https://github.com/google/gvisor}
+}
+@online{sigstore,
+  title={Sigstore Cosign: Container signing and verification},
+  year={2025},
+  url={https://docs.sigstore.dev/cosign/overview/}
+}
+@online{slsa,
+  title={SLSA: Supply-chain Levels for Software Artifacts},
+  year={2025},
+  url={https://slsa.dev/}
+}
+\end{filecontents*}
+
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shadows.blur,decorations.pathreplacing,shapes.multipart}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{titlesec}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false
+}
+
+\newcommand{\compbox}[3]{%
+  \begin{tikzpicture}[>=Latex, node distance=6mm]
+    \node[draw, rounded corners, fill=gray!5, inner sep=4mm, minimum width=#1, align=left, blur shadow] (box) {#3};
+    \node[anchor=north west, font=\bfseries] at ($(box.north west)+(2mm,-2mm)$) {#2};
+  \end{tikzpicture}
+}
+
+\begin{document}
+\begin{center}
+{\LARGE \textbf{Engineering Design Spec (MVP): SciResearch-AI Autonomous Research Paper System}}\\[6pt]
+\textbf{Scope:} End-to-end automated scientific papers with code execution, results capture, and LaTeX build.\\[2pt]
+\textbf{Non-goals (MVP):} Physical experiments; complex multi-tenant event buses; advanced supply-chain hardening.\\[4pt]
+\textit{This MVP focuses on essential capabilities for reliability, reproducibility, and speed. Phase 2 lists optional extensions (event bus, signed images, SLSA, deep reviewer workflows).}
+\end{center}
+
+\section{Executive Summary}
+Agentic planning (ReAct, Self-Consistency, ToT \cite{yao2023react,wang2022selfconsistency,yao2023tot}) drives autonomous research \cite{lu2024aiscientist}. Core pipeline: plan \textrightarrow{} synthesize code/tests \textrightarrow{} run jobs \textrightarrow{} analyze \textrightarrow{} build paper with numeric assertions. Infra (MVP): K8s Jobs (optional), Argo + Kueue for orchestration, MLflow + MinIO for tracking/artifacts.
+
+\section{MVP Scope \& Deliverables}
+\begin{itemize}[leftmargin=1.4em]
+  \item Planner: literature retrieval (arXiv/Crossref), idea generation, normalized research\_spec.yaml
+  \item Synthesizer: code + tests, simple container build, Argo DAG for variants; basic TTC knobs (k, b, L)
+  \item Execution: K8s Jobs (single cluster) or local runner fallback; queues: cpu, gpu-spot, gpu-high (configurable)
+  \item Analysis: MLflow metrics, artifact upload to S3/MinIO, canonical results.json
+  \item Paper Builder: LaTeX templating, citation check, \textbf{numeric assertion} check vs results.json
+  \item Reviewer: simple score with iterate-or-accept thresholds (T, N\_max)
+  \item Security (baseline): non-root images, minimal NetPol, secret mounts, egress allow-list to storage/MLflow
+  \item CI: lint+unit, build, smoke E2E on CPU; optional sign/verify in Phase 2
+\end{itemize}
+
+\section{MVP Roadmap \& Acceptance Criteria}
+\subsection*{Phased Implementation (2–3 weeks)}
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{Week 1:}\ \emph{Core pipeline}\; Planner \Rightarrow Synthesizer \Rightarrow Local/K8s Runner \Rightarrow Analysis \Rightarrow Paper Builder
+    \begin{itemize}
+      \item Parse literature and draft \texttt{research\_spec.yaml}; create minimal bib (arXiv/Crossref)
+      \item Generate Python code + tests; run locally; log to MLflow; push artifacts to MinIO
+      \item Build LaTeX with numeric assertion check vs \texttt{results.json}
+    \end{itemize}
+  \item \textbf{Week 2:}\ \emph{K8s orchestration + queues}\; Argo DAG + Kueue queues (cpu/gpu-spot/gpu-high), TTC(k)
+    \begin{itemize}
+      \item Submit variants via Argo; Kueue admission; basic autoscaling policy
+      \item Reviewer loop with thresholds (T, N\_max); iterate or accept
+    \end{itemize}
+  \item \textbf{Week 3:}\ \emph{Hardening \/ Observability}
+    \begin{itemize}
+      \item Baseline security: non-root images, minimal NetworkPolicies, secrets from KMS/Vault
+      \item Dashboards for GPU util, queue depth, run success, cost projections
+      \item CI: lint+unit, build, CPU smoke E2E; rollback on failures
+    \end{itemize}
+\end{enumerate}
+\subsection*{Acceptance Criteria (MVP)}
+\begin{itemize}[leftmargin=1.4em]
+  \item End-to-end run produces a LaTeX paper whose numeric claims match \texttt{results.json}
+  \item At least one GPU and one CPU variant can be executed via Argo+Kueue (or local fallback)
+  \item Reproducibility: image digest, git SHA, object version IDs recorded in MLflow and \texttt{results.json}
+  \item TTC: self-consistency parameter \(k\) reduces cost to meet budget without failing the run
+\end{itemize}
+
+\section{Minimal Local Development \& Runbook (Windows/conda)}
+\begin{lstlisting}[style=code,language=bash,caption={Local smoke run (CPU)}]
+# create and activate env
+conda create -n sciresearch-ai python=3.11 -y
+conda activate sciresearch-ai
+pip install -r requirements.txt
+
+# run minimal pipeline
+echo "{\"title\":\"demo\",\"budget_usd\":10}" > projects/demo/spec.json
+python generate_paper.py
+# outputs under projects/<name>/ paper/*.tex and artifacts in MinIO/MLflow (if configured)
+\end{lstlisting}
+\noindent\textit{Optional:} configure MLflow and MinIO endpoints via environment variables for artifact tracking.
+
+\section{Interfaces, Schemas, and Contracts}
+\subsection{Canonical Artifacts}
+\begin{lstlisting}[style=code,language=json,caption={results.json JSON Schema (excerpt)}]
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Results",
+  "type":"object",
+  "required":["experiment_id","variants","figures","artifacts"],
+  "properties":{
+    "experiment_id":{"type":"string", "pattern":"^exp_[0-9_]+$"},
+    "seed_policy":{"type":"object","properties":{"master_seed":{"type":"integer"}}},
+    "variants":{
+      "type":"object",
+      "additionalProperties":{
+        "type":"object",
+        "required":["rmse","runtime_sec"],
+        "properties":{
+          "rmse":{"type":"number"},
+          "runtime_sec":{"type":"number"},
+          "seeds":{"type":"array","items":{"type":"integer"}}
+        }
+      }
+    },
+    "mlflow_run_urls":{"type":"array","items":{"type":"string","format":"uri"}},
+    "figures":{"type":"array","items":{"type":"string"}},
+    "artifacts":{"type":"array","items":{"type":"string"}}
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=code,language=yaml,caption={research_spec.yaml (normalized fields)}]
+version: 1
+id: rs_2025_08_21_0001
+title: "..."
+budget_usd: 100
+deadline_hours: 24
+seed_policy: { master_seed: 172421 }
+datasets:
+  - name: synthetic_regression_v1
+methods:
+  - baseline_greedy
+  - self_consistency_k=10
+metrics: [rmse, runtime_sec, gpu_hours]
+\end{lstlisting}
+
+\subsection{Event Bus (Kafka/NATS) Payloads w/ Versioning}
+\textit{Optional (Phase 2). Not required for MVP; direct component invocation and Argo artifacts suffice.}
+\begin{lstlisting}[style=code,language=json,caption={Event: research.spec.created v1}]
+{
+  "version":"1.0",
+  "spec_url":"s3://bucket/specs/rs_2025_08_21_0001.yaml",
+  "spec_hash":"sha256:...",
+  "trace_id":"trc-abc123",
+  "created_at":"2025-08-21T12:00:00Z"
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=code,language=json,caption={Event: research.results.available v1}]
+{
+  "version":"1.0",
+  "results_url":"s3://bucket/results/exp_2025_08_21_1234/results.json",
+  "experiment_id":"exp_2025_08_21_1234",
+  "mlflow_experiment":"exp_42",
+  "digest":"sha256:...",
+  "trace_id":"trc-abc123"
+}
+\end{lstlisting}
+
+\subsection{AuthN/Z}
+All internal HTTP/gRPC endpoints require **mTLS** (service accounts) and a short‑lived **JWT** with audience scoping. Topic ACLs restrict publish/subscribe per component.
+
+\section{Component Blueprints (Updated Diagrams)}
+\subsection{A. Research Planner}
+\begin{figure}[h]
+\centering
+\compbox{12cm}{A.1 Internals}{
+\begin{minipage}{0.95\linewidth}
+\textbf{Submodules:} Ingest, Literature (S2/arXiv/Crossref APIs \cite{semanticscholarAPI,arxivAPI,crossrefAPI}), Idea Gen (GPT‑5), Novelty Check (Vector DB), Spec Writer (YAML).\\
+\textbf{Hardening:} egress allow‑list to literature hosts; cache PDFs; rate‑limit with backoff.\\
+\textbf{Outputs:} \texttt{research\_spec.yaml}, \texttt{refs.json}, cached PDFs, bib keys.
+\end{minipage}
+}
+\caption{Planner internals with controlled egress and caching.}
+\end{figure}
+
+\subsection{B. Code Synthesizer \& Orchestrator}
+\begin{figure}[h]
+\centering
+\compbox{12cm}{B.1 Internals}{
+\begin{minipage}{0.95\linewidth}
+ReAct tool-calls \cite{yao2023react} and optional Toolformer-style tool learning \cite{schick2023toolformer}. Generates code + tests, builds image, signs with cosign \cite{sigstore}, emits Argo DAG. TTC knobs embedded as parameters.
+\end{minipage}
+}
+\caption{Synthesizer with signed images and TTC knobs.}
+\end{figure}
+
+\subsection{C. Execution Sandbox (K8s Jobs)}
+\begin{figure}[h]
+\centering
+\compbox{12cm}{C.1 Internals}{
+\begin{minipage}{0.95\linewidth}
+Kueue queues map variants to node pools; gVisor runtime; PSS restricted; NetworkPolicies deny-all + allow S3/MLflow only. Images verified (cosign), SBOM checked (SLSA) \cite{sigstore,slsa}.
+\end{minipage}
+}
+\caption{Execution layer security and queueing.}
+\end{figure}
+
+\subsection{D. Analysis \& Visualization}
+\begin{figure}[h]
+\centering
+\compbox{12cm}{D.1 Internals}{
+\begin{minipage}{0.95\linewidth}
+Aggregates MLflow metrics; computes stats; generates figs/tables; writes canonical \texttt{results.json}; provenance links to image digests and git SHAs.
+\end{minipage}
+}
+\caption{Analysis with provenance \& lineage.}
+\end{figure}
+
+\subsection{E. Paper Builder (Validation Added)}
+\begin{figure}[h]
+\centering
+\compbox{12cm}{E.1 Internals}{
+\begin{minipage}{0.95\linewidth}
+Template filler + writer (GPT‑5), \textbf{Assertion Checker}: fails build if any number cited in text mismatches \texttt{results.json}; DOI lookup; deterministic \texttt{latexmk}.
+\end{minipage}
+}
+\caption{Paper generation with numeric assertion checks.}
+\end{figure}
+
+\subsection{F. Reviewer \& Iteration Manager (State Machine)}
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[>=Latex, node distance=12mm, font=\small]
+\tikzstyle{st}=[draw, rounded corners, fill=white, inner sep=2mm, minimum width=3.2cm, align=center]
+\node[st] (draft) {DRAFT};
+\node[st, right=2.8cm of draft] (review) {REVIEW};
+\node[st, right=2.8cm of review] (improve) {IMPROVE};
+\node[st, below=12mm of review] (accept) {ACCEPT};
+\node[st, below=12mm of improve] (abandon) {ABANDON};
+\draw[->] (draft) -- node[above]{submit} (review);
+\draw[->] (review) -- node[above]{score < T \& actionable} (improve);
+\draw[->] (review) -- node[left]{score ≥ T \& coverage OK} (accept);
+\draw[->] (improve) -- node[right]{N tries ≥ Nmax or budget hit} (abandon);
+\draw[->] (improve) -- node[above]{new exps / edits} (review);
+\end{tikzpicture}
+\caption{Iteration state machine with thresholds \(T\), \(N_{\max}\) and budget stops.}
+\end{figure}
+
+\section{Budgeted Test-Time Compute (TTC) Controller}
+\subsection{Knobs and Mapping}
+\textbf{MVP simplification:} use only self-consistency samples \(k\). Beam width \(b\) and depth \(L\) are \textit{optional Phase 2} knobs.
+\[\mathrm{gpu\_hours} \approx \sum_{i} \frac{k_i \cdot c_i}{\eta_{util}}\]
+where \(c_i\) is per-sample cost estimated from prior runs; \(\eta_{\text{util}}\) is utilization. Controller chooses \(k\) to satisfy:
+\[
+\text{gpu\_hours} \cdot p_{\text{gpu}} + \text{cpu\_hours} \cdot p_{\text{cpu}} \le \text{budget\_usd}.
+\]
+On shortfall, reduce \(k\) (only, in priority order), or move jobs from \texttt{gpu-high} to \texttt{gpu-spot} with preemption tolerance.
+
+\subsection{Policy (executable sketch)}
+\begin{lstlisting}[style=code,caption={Budget controller pseudocode (MVP k-only)}]
+def allocate_ttc(spec, priors, prices):
+    plan = []
+    for v in spec.methods:
+        est_gpu = priors.estimate_gpu_hours(k=v.k)
+        plan.append((v, est_gpu))
+    while cost(plan, prices) > spec.budget_usd:
+        for v,_ in sorted(plan, key=lambda x: x[1], reverse=True):
+            if v.k > 1: v.k -= 1; break
+        else:
+            raise BudgetError("Cannot fit budget")
+    return plan
+\end{lstlisting}
+
+\section{Scheduling and Queues}
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Queues:} \texttt{cpu}, \texttt{ingest}, \texttt{gpu-spot}, \texttt{gpu-high}. Kueue admits/suspends; Argo parallelism bounds TTC breadth \cite{kueueDocs,argoDocs}.
+\item \textbf{Autoscaling:} Cluster Autoscaler grows node pools on pending; max nodes per pool pinned to budget \cite{k8sAutoscaler}.
+\end{itemize}
+
+\section{Security, Secrets, and Supply Chain}
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Baseline (MVP):} non-root containers; minimal NetworkPolicies (deny-all, allow S3/MLflow/Postgres); secret mounts via KMS/Vault; short-lived tokens; optional mTLS in single cluster.
+\item \textbf{Egress:} allow-list only to storage/MLflow; literature retrievers limited to specific hosts.
+\item \textbf{Phase 2 (Optional):} image signing (cosign), SBOM + SLSA provenance, admission verify.
+\end{itemize}
+
+\section{Reproducibility \& Lineage}
+\begin{itemize}[leftmargin=1.4em]
+\item Pin images by \textbf{digest}, code by \textbf{git SHA}, data by \textbf{object version ID}.
+\item \textbf{Seeds:} global master seed with deterministic sub‑seeds per variant; recorded in \texttt{results.json}.
+\item MLflow run tags: \texttt{image\_digest}, \texttt{git\_sha}, \texttt{spec\_id}, \texttt{seed}.
+\end{itemize}
+
+\section{Paper Validation (Hard Checks)}
+The Paper Builder fails compile if:
+\begin{enumerate}[leftmargin=1.4em]
+\item Any numeric literal referenced with tag \verb|\result{path.to.metric}| does not equal the value in \texttt{results.json}.
+\item Any figure path in LaTeX not present in S3.
+\item Any citation key missing from \texttt{refs.bib}.
+\end{enumerate}
+
+\noindent\textbf{Usage in LaTeX:}
+\begin{lstlisting}[style=code,language=TeX,caption={Numeric reference macro}]
+% \result{variants.self_consistency_k10.rmse} -> 0.191
+\newcommand{\result}[1]{\input{.cache/results/#1.tex}}
+\end{lstlisting}
+
+\section{Observability \& SLOs}
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{SLOs:} P95 time to first experiment $<$ 20 min; P95 paper build success $>$ 99\%; Reviewer loop $\leq 3$ iterations in 90\% of runs.
+\item \textbf{Alerts:} queue wait $>$ 15m (warn), 30m (crit); OOMKilled count $>$ 3/run; cost projection exceed budget.
+\item \textbf{Dashboards:} GPU util, queue depth, success rates, cost per run, reviewer scores over time.
+\end{itemize}
+
+\section{CI/CD and Environments}
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Stages (MVP):} dev (cpu only) $\rightarrow$ staging (gpu-spot) $\rightarrow$ prod (gpu-high).
+\item \textbf{Pipeline:} lint+unit $\rightarrow$ build $\rightarrow$ smoke run (baseline) $\rightarrow$ promote. \textit{Optional:} SBOM+scan, sign+verify in Phase 2.
+\item \textbf{Rollback:} revert to previous image on elevated failure rate.
+\end{itemize}
+
+\section{Testing Strategy}
+\begin{itemize}[leftmargin=1.4em]
+  \item \textbf{Unit (MVP):} schema validation; TTC controller (k-only); numeric assertion macro
+  \item \textbf{Integration:} local run produces \texttt{results.json}; Paper build fails on mismatched numbers
+  \item \textbf{E2E Smoke:} CPU-only pipeline under 5 minutes; accepts or iterates within N\_max
+\end{itemize}
+
+\section{Failure Modes and Automated Remediation}
+\begin{tabular}{@{}p{3.7cm}p{6.8cm}p{4.6cm}@{}}
+\toprule
+Failure & Detection & Automated Remediation \\\midrule
+Queue starvation & wait\_time $>$ 30m & Reduce $k$ by 50\%, move to gpu-spot; if still pending, downgrade to cpu fallback \\
+Compile error & latexmk nonzero & Re-generate missing refs, re-fetch figs; on 2nd fail, open ticket and attach logs \\
+Novelty collision & high sim score & Planner rewrites hypothesis or picks next idea; add filter term to queries \\
+Budget exceed & cost projection $>$ budget & TTC controller shrinks $k\rightarrow b\rightarrow L$; cancel low-ROI variants \\
+\bottomrule
+\end{tabular}
+
+\section{Appendix: Example Manifests}
+\subsection*{Kueue/Argo (GPU job with TTC parallelism)}
+\begin{lstlisting}[style=code,language=yaml]
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata: { generateName: research-run- }
+spec:
+  entrypoint: main
+  templates:
+  - name: main
+    dag:
+      tasks:
+      - name: build
+        template: docker-build
+      - name: k10
+        dependencies: [build]
+        template: kueue-job
+        arguments: { parameters: [{name: k, value: 10}] }
+  - name: kueue-job
+    inputs:
+      parameters:
+      - name: k
+    resource:
+      action: create
+      manifest: |
+        apiVersion: batch/v1
+        kind: Job
+        metadata: { name: train-k{{inputs.parameters.k}} }
+        spec:
+          parallelism: {{inputs.parameters.k}}
+          template:
+            spec:
+              runtimeClassName: gvisor
+              containers:
+              - name: runner
+                image: registry/research@sha256:...
+                resources:
+                  requests: { nvidia.com/gpu: 1, cpu: "4", memory: "16Gi" }
+                  limits:   { nvidia.com/gpu: 1, cpu: "4", memory: "16Gi" }
+                env:
+                  - { name: MLFLOW_TRACKING_URI, value: "http://mlflow:5000" }
+                  - { name: S3_ENDPOINT, value: "http://minio:9000" }
+              restartPolicy: Never
+\end{lstlisting}
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+\end{document}
