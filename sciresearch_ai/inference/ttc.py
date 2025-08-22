@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
 # --- Test-Time Compute (TTC) strategies ---
 # Self-consistency / Best-of-N with majority vote + simple scoring hooks.
@@ -69,3 +69,40 @@ def budgeted_adaptive_deliberation(
     if best is None and all_samples:
         best = all_samples[0]
     return {"best": best or "", "samples": all_samples, "scores": all_scores}
+
+
+def tree_of_thoughts(
+    provider_generate: Callable[[str, int], List[str]],
+    prompt: str,
+    depth: int,
+    breadth: int,
+    scorer: Callable[[str], float] | None = None,
+) -> Dict[str, Any]:
+    """Simple breadth-first Tree-of-Thoughts search.
+
+    Args:
+        provider_generate: function that expands a state into ``breadth`` thoughts.
+        prompt: initial state to expand from.
+        depth: number of expansion rounds.
+        breadth: beam width; number of states kept per level.
+        scorer: optional heuristic to rank states. Higher is better.
+
+    Returns:
+        Mapping with the best final state and the path of thoughts leading to it.
+    """
+
+    frontier: List[Tuple[str, List[str]]] = [(prompt, [])]
+    for _ in range(depth):
+        candidates: List[Tuple[str, List[str]]] = []
+        for state, path in frontier:
+            thoughts = provider_generate(state, breadth)
+            for t in thoughts:
+                new_state = f"{state}\n{t}"
+                candidates.append((new_state, path + [t]))
+        if not candidates:
+            break
+        if scorer:
+            candidates.sort(key=lambda n: scorer(n[0]), reverse=True)
+        frontier = candidates[:breadth]
+    best_state, best_path = frontier[0] if frontier else ("", [])
+    return {"best": best_state, "path": best_path}

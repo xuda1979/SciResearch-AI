@@ -357,7 +357,7 @@ Template filler + writer (GPT‑5), \textbf{Assertion Checker}: fails build if a
 
 \section{Budgeted Test-Time Compute (TTC) Controller}
 \subsection{Knobs and Mapping}
-\textbf{MVP simplification:} use only self-consistency samples \(k\). Beam width \(b\) and depth \(L\) are \textit{optional Phase 2} knobs.
+\textbf{MVP simplification:} use only self-consistency samples \(k\). Beam width \(b\) and depth \(L\) for structured search (e.g., Tree of Thoughts) are \textit{optional Phase 2} knobs.
 \[\mathrm{gpu\_hours} \approx \sum_{i} \frac{k_i \cdot c_i}{\eta_{util}}\]
 where \(c_i\) is per-sample cost estimated from prior runs; \(\eta_{\text{util}}\) is utilization. Controller chooses \(k\) to satisfy:
 \[
@@ -379,6 +379,15 @@ def allocate_ttc(spec, priors, prices):
             raise BudgetError("Cannot fit budget")
     return plan
 \end{lstlisting}
+
+\subsection{Advanced Inference-Time Algorithms}
+Beyond best-of-\(k\) voting, the controller can escalate to more structured search when additional budget is available:
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Tree of Thoughts (ToT):} explore a reasoning tree with beam width \(b\) and depth \(L\), pruning by heuristic or learned scores \cite{yao2023tot}.
+\item \textbf{Multi-agent debate:} spawn parallel agents and select a consensus answer after critique rounds to improve factuality \cite{yao2023react}.
+\item \textbf{Reflection loops:} critique and revise drafts until a checklist passes, reducing formatting and citation errors.
+\end{itemize}
+The controller allocates budget across these techniques and falls back to self-consistency for low budgets.
 
 \section{Scheduling and Queues}
 \begin{itemize}[leftmargin=1.4em]
