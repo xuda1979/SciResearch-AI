@@ -8,16 +8,32 @@
 \maketitle
 
 \begin{abstract}
-This paper introduces the concept of Proof-Carrying Answers (PCA) combined with property-based self-fuzzing as a means to improve reliability and verifiability of large language model outputs. PCA requires that each generated answer includes a machine-checkable proof or verification script. Property-based self-fuzzing uses counterexample generators to test claims by systematically searching for violations.
+Proof-Carrying Answers (PCA) require each model output to include a
+machine-checkable proof or verification script. Property-based
+self-fuzzing complements PCA by stress-testing claims with generated
+counterexamples. Together they increase the reliability and
+verifiability of large language model responses.
 \end{abstract}
 
 \section{Introduction}
-Modern LLMs suffer from hallucination and unverifiable statements. PCA addresses this by packaging answers with proof artifacts, while self-fuzzing generates and tests counterexamples.
+Modern large language models often emit unverifiable statements.
+Packaging every answer with proof artifacts helps mitigate
+hallucination, while self-fuzzing probes weaknesses by searching for
+counterexamples.
 
 \section{Method}
-We describe the technique: for each claim, produce code that checks the claim and attempts to find counterexamples. The code is executed in a sandbox environment to ensure safety.
+For each claim, the system emits executable code that checks the claim
+and attempts to find counterexamples. The code runs in a sandboxed
+environment to ensure safety.
 
 \section{Implementation}
-The implementation is provided in \texttt{code.py}, which imports the \texttt{sciresearch\_ai} module to leverage existing utilities and demonstrates a simple example of generating a proof-carrying answer.
+The file \texttt{code.py} demonstrates how to generate a
+proof-carrying answer using the \texttt{sciresearch\_ai} module and how
+to fuzz a simple property.
+
+\section{Conclusion}
+Combining PCA with property-based self-fuzzing provides a lightweight
+approach to increase trust in language model outputs by demanding
+explicit proofs and automatically searching for violations.
 
 \end{document}
