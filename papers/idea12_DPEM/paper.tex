@@ -11,19 +11,40 @@
 \maketitle
 
 \begin{abstract}
-Long-lived conversational agents risk accumulating sensitive or malicious information in their internal caches.  Differentially-Private Ephemeral Memory (DPEM) aims to enforce the ``right to be forgotten'' and limit prompt‑injection persistence by associating each memory with a privacy budget and a revocation token.  When the budget is exhausted or a valid revocation request is received, the memory is purged from the model's context.
+Long-lived conversational agents risk accumulating sensitive or malicious
+information in their internal caches.  Differentially-Private Ephemeral
+Memory (DPEM) aims to enforce the ``right to be forgotten'' and limit
+prompt‑injection persistence by associating each memory with a privacy budget
+and a revocation token.  When the budget is exhausted or a valid
+revocation request is received, the memory is purged from the model's
+context.
 \end{abstract}
 
 \section{Problem}
-Autoregressive LLMs accumulate context across multiple turns and may implicitly memorize user inputs.  This persistent state makes it difficult to honour deletion requests or to prevent toxic content from resurfacing.  Na{"i}ve history truncation harms coherence, while full retention violates privacy regulations.
+Autoregressive LLMs accumulate context across multiple turns and may
+implicitly memorize user inputs.  This persistent state makes it
+difficult to honour deletion requests or to prevent toxic content from
+resurfacing.  Na{"i}ve history truncation harms coherence, while full
+retention violates privacy regulations.
 
 \section{Method}
-DPEM treats each stored fact or chunk as a tuple $(v,\varepsilon,\tau,\mathit{revID})$ where $v$ is the value, $\varepsilon$ is a differential privacy budget, $\tau$ is a time-to-live, and $\mathit{revID}$ is a signed revocation token.  The agent's router retrieves a memory only if its remaining budget exceeds a threshold and its revocation token has not been submitted.  Each retrieval decrements $\varepsilon$, modelling privacy loss.  A revocation request carrying $\mathit{revID}$ immediately deletes the associated memory.
+DPEM treats each stored fact or chunk as a tuple $(v,\varepsilon,\tau,
+\mathit{revID})$ where $v$ is the value, $\varepsilon$ is a
+differential privacy budget, $\tau$ is a time-to-live, and
+$\mathit{revID}$ is a signed revocation token.  The agent's router
+retrieves a memory only if its remaining budget exceeds a threshold
+and its revocation token has not been submitted.  Each retrieval
+decrements $\varepsilon$, modelling privacy loss.  A revocation
+request carrying $\mathit{revID}$ immediately deletes the associated
+memory.
 
 \section{Prototype}
-Listing~\ref{lst:dpem} shows a simple Python prototype of an ephemerally private memory store.  Each entry decays over time and can be revoked via a token.
+Listing~\ref{lst:dpem} shows a simple Python prototype of an
+ephemerally private memory store.  Each entry decays over time and
+can be revoked via a token.
 
-\begin{lstlisting}[language=Python, caption={Prototype of a DPEM store.}, label={lst:dpem}]
+\begin{lstlisting}[language=Python, caption={Prototype of a DPEM
+store.}, label={lst:dpem}]
 import time
 
 class DPEMStore:
@@ -69,20 +90,29 @@ if __name__ == "__main__":
     print(mem.get("another"))  # None after revocation
 \end{lstlisting}
 
-This prototype illustrates per‑access budget decrementing and time‑based expiry.  A production system would integrate digital signatures for $\mathit{revID}$ and enforce differential privacy accounting across multiple memories.
+This prototype illustrates per-access budget decrementing and time-based
+expiry. The accompanying \texttt{code.py} script imports the
+\texttt{sciresearch\_ai} module to report the package version and
+demonstrate integration with the repository. A production system
+would integrate digital signatures for $\mathit{revID}$ and enforce
+differential privacy accounting across multiple memories.
 
 \section{Evaluation}
 Useful metrics include:
 \begin{itemize}
-  \item \textbf{Forgetting latency:} time between a revocation request and the memory becoming inaccessible.
-  \item \textbf{Leakage under membership tests:} probability that an attacker can infer whether a revoked fact was ever stored.
-  \item \textbf{User trust:} satisfaction and compliance scores collected from participants issuing deletions.
+  \item \textbf{Forgetting latency:} time between a revocation request
+        and the memory becoming inaccessible.
+  \item \textbf{Leakage under membership tests:} probability that an
+        attacker can infer whether a revoked fact was ever stored.
+  \item \textbf{User trust:} satisfaction and compliance scores
+        collected from participants issuing deletions.
 \end{itemize}
 
 \section{Failure modes}
-Over‑aggressive forgetting can degrade the user experience by causing the agent to lose necessary context.  Under‑estimating privacy loss may leave sensitive information exposed.  Balancing $\varepsilon$ and TTL per user or tenant is essential for safety and utility.
-
-\section{Conclusion}
-DPEM provides a principled mechanism for ephemeral memory, balancing utility and privacy while allowing users to revoke stored data.
+Over-aggressive forgetting can degrade the user experience by causing
+the agent to lose necessary context.  Under-estimating privacy loss
+may leave sensitive information exposed.  Balancing
+$\varepsilon$ and TTL per user or tenant is essential for safety and
+utility.
 
 \end{document}
