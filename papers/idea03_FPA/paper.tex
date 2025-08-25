@@ -8,21 +8,24 @@
 \maketitle
 
 \begin{abstract}
-This paper introduces Field-Programmable Attention (FPA), a technique to program sparse attention patterns based on task-specific signals to improve long-context utilization and reduce computational cost.
+This paper introduces Field-Programmable Attention (FPA), a technique to
+program sparse attention patterns based on task-specific signals to improve
+long-context utilization and reduce computational cost.
 \end{abstract}
 
 \section{Introduction}
-Large language models struggle to maintain focus over long contexts, often losing critical information. Dense attention is expensive and may ignore important sections.
+Large language models struggle to maintain focus over long contexts, often
+losing critical information. Dense attention is expensive and may ignore
+important sections.
 
 \section{Method}
-FPA pre-compiles a block-sparse attention mask using cues such as titles, headings, anchors, and entities. The mask generator outputs patterns that inform the attention mechanism to attend selectively.
+FPA pre-compiles a block-sparse attention mask using cues such as titles,
+headings, anchors, and entities. The mask generator outputs patterns that
+inform the attention mechanism to attend selectively.
 
 \section{Implementation}
-The implementation uses the \texttt{sciresearch\_ai} module. The accompanying \texttt{code.py} demonstrates how to create a simple attention mask for a toy sequence.
-
-\section{Conclusion}
-Programmable sparse attention allows models to handle long documents
-efficiently while focusing on the most relevant portions of the
-context.
+The implementation uses the \texttt{sciresearch\_ai} module. The accompanying
+\texttt{code.py} demonstrates how to create a simple attention mask for a toy
+sequence.
 
 \end{document}
