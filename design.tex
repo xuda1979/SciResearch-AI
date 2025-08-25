@@ -152,6 +152,15 @@
 \section{Executive Summary}
 Agentic planning (ReAct, Self-Consistency, ToT \cite{yao2023react,wang2022selfconsistency,yao2023tot}) drives autonomous research \cite{lu2024aiscientist}. Core pipeline: plan \textrightarrow{} synthesize code/tests \textrightarrow{} run jobs \textrightarrow{} analyze \textrightarrow{} build paper with numeric assertions. Infra (MVP): K8s Jobs (optional), Argo + Kueue for orchestration, MLflow + MinIO for tracking/artifacts.
 
+\paragraph{Update for Local Heuristic Implementation.}  While the long‑term vision of SciResearch‑AI includes distributed orchestration and execution on Kubernetes, the present implementation focuses on a streamlined local pipeline that can run offline without network access.  This reduced footprint enables rapid iteration and high‑quality paper drafts in constrained environments.  Key updates include:
+\begin{itemize}[leftmargin=1.4em]
+  \item \textbf{Heuristic provider:} an offline language model surrogate that generates coherent scientific prose based on prompt keywords.  It covers planning, experiment design, critique, and revision without contacting external APIs.
+  \item \textbf{Experiment runner:} a deterministic Python routine that executes the synthetic study described in the heuristic plan.  It produces quantitative metrics (e.g., RMSE) used in the results section and ensures reproducibility via a fixed random seed.
+  \item \textbf{Sequential section filling:} the orchestrator writes the LaTeX draft in stages.  Each iteration of the loop fills the next “TBD.” placeholder (Methods, Experiments, Results, Discussion) with LaTeX‑escaped content derived from the plan, protocol, experiment runner, and debate.  This avoids duplicate insertions and yields a complete paper in exactly four passes.
+  \item \textbf{Test‑time compute (TTC):} we employ self‑consistency and budgeted adaptive deliberation \cite{wang2022selfconsistency} to sample multiple candidate experiment designs.  A simple scoring function prioritizes long, structured answers.  Early stopping triggers when the leading candidate is sufficiently better than the average, saving compute.
+  \item \textbf{Validation gates:} the paper manager verifies that the draft mentions innovation/novelty, that any citations are backed by a BibTeX entry, and that pdflatex compilation either succeeds or is skipped gracefully if the binary is unavailable.  These checks guard against trivial outputs and missing references.
+\end{itemize}
+
 \section{MVP Scope \& Deliverables}
 \begin{itemize}[leftmargin=1.4em]
   \item Planner: literature retrieval (arXiv/Crossref), idea generation, normalized research\_spec.yaml
@@ -357,7 +366,7 @@ Template filler + writer (GPT‑5), \textbf{Assertion Checker}: fails build if a
 
 \section{Budgeted Test-Time Compute (TTC) Controller}
 \subsection{Knobs and Mapping}
-\textbf{MVP simplification:} use only self-consistency samples \(k\). Beam width \(b\) and depth \(L\) for structured search (e.g., Tree of Thoughts) are \textit{optional Phase 2} knobs.
+\textbf{MVP simplification:} use only self-consistency samples \(k\). Beam width \(b\) and depth \(L\) are \textit{optional Phase 2} knobs.
 \[\mathrm{gpu\_hours} \approx \sum_{i} \frac{k_i \cdot c_i}{\eta_{util}}\]
 where \(c_i\) is per-sample cost estimated from prior runs; \(\eta_{\text{util}}\) is utilization. Controller chooses \(k\) to satisfy:
 \[
@@ -379,15 +388,6 @@ def allocate_ttc(spec, priors, prices):
             raise BudgetError("Cannot fit budget")
     return plan
 \end{lstlisting}
-
-\subsection{Advanced Inference-Time Algorithms}
-Beyond best-of-\(k\) voting, the controller can escalate to more structured search when additional budget is available:
-\begin{itemize}[leftmargin=1.4em]
-\item \textbf{Tree of Thoughts (ToT):} explore a reasoning tree with beam width \(b\) and depth \(L\), pruning by heuristic or learned scores \cite{yao2023tot}.
-\item \textbf{Multi-agent debate:} spawn parallel agents and select a consensus answer after critique rounds to improve factuality \cite{yao2023react}.
-\item \textbf{Reflection loops:} critique and revise drafts until a checklist passes, reducing formatting and citation errors.
-\end{itemize}
-The controller allocates budget across these techniques and falls back to self-consistency for low budgets.
 
 \section{Scheduling and Queues}
 \begin{itemize}[leftmargin=1.4em]
