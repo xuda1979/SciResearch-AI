@@ -12,24 +12,47 @@
 \maketitle
 
 \begin{abstract}
-Large language models (LLMs) equipped with extremely long context windows suffer from high memory bandwidth requirements and prohibitive VRAM usage because key and value (K/V) states must be stored for every token.  ``KV\-Sketching'' is a family of techniques that learns to compress K/V state tensors into compact sketches that can be rehydrated on demand.  By combining low\-rank approximations, count\-sketch hashing and quantization, one can achieve multi\-million\-token contexts without a linear growth in memory footprint.
+Large language models (LLMs) equipped with extremely long context
+windows suffer from high memory bandwidth requirements and prohibitive
+VRAM usage because key and value (K/V) states must be stored for every
+token.  ``KV-Sketching'' is a family of techniques that learns to
+compress K/V state tensors into compact sketches that can be
+rehydrated on demand.  By combining low-rank approximations,
+count-sketch hashing and quantization, one can achieve multi-million-token
+contexts without a linear growth in memory footprint.
 \end{abstract}
 
 \section{Problem}
-Attention mechanisms require storing a matrix of key and value vectors for every layer and token.  For a context window of one million tokens the uncompressed K/V state can exceed tens of gigabytes, making inference on consumer hardware impossible.  Existing sparse attention kernels (e.g., FlashAttention\-3) reduce compute but not the memory footprint.
+Attention mechanisms require storing a matrix of key and value vectors for
+every layer and token.  For a context window of one million tokens the
+uncompressed K/V state can exceed tens of gigabytes, making inference on
+consumer hardware impossible.  Existing sparse attention kernels (e.g.,
+FlashAttention-3) reduce compute but not the memory footprint.
 
 \section{Method}
-KV\-Sketching trains lightweight adapters on top of a frozen LLM that produce sketchable K/V states.  Each layer yields two outputs:
+KV-Sketching trains lightweight adapters on top of a frozen LLM that
+produce sketchable K/V states.  Each layer yields two outputs:
 \begin{enumerate}
-  \item A low\-dimensional projection of the K/V state (learned low\-rank basis and quantized coefficients).
-  \item An uncertainty score that determines whether the sketch is sufficiently accurate.
+  \item A low-dimensional projection of the K/V state (learned low-rank
+        basis and quantized coefficients).
+  \item An uncertainty score that determines whether the sketch is
+        sufficiently accurate.
 \end{enumerate}
-During inference, we maintain only the sketches and lazily rehydrate the exact K/V vectors when attention queries require high\-fidelity context.  Per\-layer error budgets ensure that accumulated approximation error does not degrade downstream predictions.  When the uncertainty exceeds a threshold the system rehydrates and caches the exact K/V vectors for that span.
+During inference, we maintain only the sketches and lazily rehydrate
+the exact K/V vectors when attention queries require high-fidelity
+context.  Per-layer error budgets ensure that accumulated approximation
+error does not degrade downstream predictions.  When the uncertainty
+exceeds a threshold the system rehydrates and caches the exact K/V
+vectors for that span.
 
 \section{Prototype}
-As a toy example, Algorithm~\ref{alg:kvsketch} illustrates KV\-sketching using singular value decomposition (SVD) to compress a small matrix representing K/V states.  A practical system would replace SVD with learnable projections and count\-sketch hashing.
+As a toy example, Algorithm~\ref{alg:kvsketch} illustrates
+KV-sketching using singular value decomposition (SVD) to compress a
+small matrix representing K/V states.  A practical system would
+replace SVD with learnable projections and count-sketch hashing.
 
-\begin{lstlisting}[language=Python, caption={Simple KV\-sketching prototype using SVD.}, label={alg:kvsketch}]
+\begin{lstlisting}[language=Python, caption={Simple KV-sketching
+prototype using SVD.}, label={alg:kvsketch}]
 import numpy as np
 
 def svd_sketch(matrix, rank=2):
@@ -53,20 +76,26 @@ error = np.linalg.norm(state - approx)
 print(f"Approximation error: {error:.4f}")
 \end{lstlisting}
 
-The accompanying \texttt{code.py} file in this folder implements this example and imports the \texttt{sciresearch\_ai} package to demonstrate integration with the repository.
+The accompanying \texttt{code.py} file in this folder implements
+this example and imports the \texttt{sciresearch\_ai} package to
+demonstrate integration with the repository.
 
 \section{Evaluation}
-To evaluate KV\-Sketching one can monitor:
+To evaluate KV-Sketching one can monitor:
 \begin{itemize}
-  \item \textbf{Speedup vs.\ quality:} compare throughput (tokens/s) and perplexity for the sketched model versus the baseline.
-  \item \textbf{Memory savings:} measure the reduction in VRAM usage per one million tokens.
-  \item \textbf{Latency:} compute p95 response times with and without rehydration.
+  \item \textbf{Speedup vs. quality:} compare throughput (tokens/s) and
+        perplexity for the sketched model versus the baseline.
+  \item \textbf{Memory savings:} measure the reduction in VRAM usage
+        per one million tokens.
+  \item \textbf{Latency:} compute p95 response times with and without
+        rehydration.
 \end{itemize}
 
 \section{Failure modes}
-Sketching introduces approximation error that can accumulate across layers.  If the uncertainty predictor underestimates error, the model may hallucinate or drop critical context.  Mitigation strategies include conservative uncertainty thresholds and periodic rehydration checkpoints.
-
-\section{Conclusion}
-KV-Sketching offers a path to multi-million-token contexts by trading exactness for controlled approximation, enabling long-range reasoning on modest hardware.
+Sketching introduces approximation error that can accumulate across
+layers.  If the uncertainty predictor underestimates error, the model
+may hallucinate or drop critical context.  Mitigation strategies
+include conservative uncertainty thresholds and periodic rehydration
+checkpoints.
 
 \end{document}
