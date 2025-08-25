@@ -9,31 +9,22 @@
 
 \maketitle
 
-\begin{abstract}
-Global-then-Local Decoding decomposes generation into a planning stage
-followed by constrained local decoding, reducing contradictions and
-improving long-form coherence.
-\end{abstract}
-
 \section{Overview}
-GLD first produces a high-level plan that outlines goals and
-constraints. Local sections are then filled under this plan using
-constrained decoding.
+Global-then-Local Decoding (GLD) decomposes generation into two phases:
+first a global plan is produced that outlines goals and constraints,
+then local sections are filled under the plan using constrained decoding.
+This approach reduces contradictions and improves coherence across long
+documents.
 
 \section{Method}
-The model initially emits a structured plan (e.g., JSON) specifying key
-subgoals, evidence to include, and ordering. A checker validates the
+The model first emits a structured plan (e.g., in JSON) specifying
+key subgoals, evidence to include, and ordering. A checker validates the
 plan before proceeding. During local decoding, the model is constrained
 to adhere to the plan and include the specified evidence.
 
 \section{Implementation}
-The provided \texttt{code.py} creates a simple plan for a document and
-fills sections with placeholder text, demonstrating how the
-\texttt{sciresearch\_ai} module can track version information.
-
-\section{Conclusion}
-Separating planning from local generation offers a straightforward way
-to improve coherence and enforce global constraints in long-form
-outputs.
+Our code example creates a simple plan for a document and then fills
+sections using placeholder text. The \texttt{sciresearch\_ai} module is
+imported for versioning information.
 
 \end{document}
