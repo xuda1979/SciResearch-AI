@@ -6,27 +6,31 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-The Answer Futures Market (AFM) routes computational budget in a
-mixture-of-experts system. Specialists bid their confidence and cost to
-answer a question, and a router allocates resources to those with the
-highest expected value of improvement.
+The Answer Futures Market (AFM) is a novel mechanism for routing
+computational budget in a mixture-of-experts or agents system.
+Specialists bid their confidence and associated cost to answer a
+question; a router allocates resources to those with the highest
+expected value of improvement.
 \end{abstract}
 \section{Introduction}
-Language models vary widely in capability, cost, and domain expertise.
-AFM formalizes a market where each model or head emits a probability of
-correctness and a bid reflecting its cost. A router chooses which
-models to consult based on expected utility.
+Language models can vary widely in capability, cost, and domain
+expertise. AFM formalizes a market where each model or head emits a
+probability of correctness and a bid reflecting its cost. A router
+chooses which models to consult based on expected utility.
 \section{Method}
 In AFM, each specialist head outputs a tuple $(p_{\text{correct}},
 \sigma^2, \text{cost})$. Using proper scoring rules, the router
 determines which bids offer the highest expected value. The selection
-can be adaptive: initial cheap models run first, and more expensive ones
-are invoked only if uncertainty remains high.
+can be adaptive: initial cheap models run first, and more expensive
+ones are invoked only if uncertainty remains high.
 \section{Implementation}
-A simple prototype can use two models: a small model and a large model.
-Each returns a confidence score. The router calls the large model only
-when the small model's confidence is below a threshold. This mechanism
-can extend to multiple experts with dynamic bidding.
+A simple prototype can use two models: a small model and a large
+model. Each returns a confidence score. The router calls the large
+model only when the small model's confidence is below a threshold. The
+accompanying \texttt{code.py} script implements this router and
+imports the \texttt{sciresearch\_ai} module to report the package
+version. This mechanism can extend to multiple experts with dynamic
+bidding.
 \section{Conclusion}
 Answer Futures Market offers a structured way to manage computational
 resources while improving answer quality by leveraging multiple
