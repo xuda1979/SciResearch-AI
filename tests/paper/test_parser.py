@@ -29,6 +29,10 @@ And some final text.
         self.assertEqual(_escape_latex("a&b"), r"a\&b")
         self.assertEqual(_escape_latex("{a_b}"), r"\{a\_b\}")
 
+    def test_math_is_preserved(self):
+        raw = "The error term $\\varepsilon$ is small."
+        self.assertEqual(parse_response(raw).strip(), raw)
+
 
 if __name__ == "__main__":
     unittest.main()
