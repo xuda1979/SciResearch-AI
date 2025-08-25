@@ -53,6 +53,11 @@ def build_provider(args, project_root: str):
             enable_browser=args.enable_browser,
             enable_python=args.enable_python,
         )
+    elif provider_name == "heuristic":
+        # Lightweight offline provider that returns semi‑structured responses without any API calls.
+        from .providers.heuristic_provider import HeuristicProvider
+
+        return HeuristicProvider()
     else:
         raise SystemExit(f"Unknown provider: {provider_name}")
 
@@ -123,9 +128,13 @@ def main(argv=None):
     p_run.add_argument("--project", required=True, help="Path to project folder")
     p_run.add_argument(
         "--provider",
-        choices=["auto", "mock", "openai", "oss"],
+        choices=["auto", "mock", "openai", "oss", "heuristic"],
         default="auto",
-        help="Select backend; 'auto' infers from --model",
+        help=(
+            "Select backend; 'auto' infers from --model. "
+            "Use 'heuristic' for an offline heuristic provider that returns "
+            "semi‑structured scientific content without external API calls."
+        ),
     )
     p_run.add_argument(
         "--model",
