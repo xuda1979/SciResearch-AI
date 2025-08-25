@@ -1,34 +1,34 @@
 """
-Example of Global-then-Local Decoding (GLD).
+Global‑then‑Local Decoding (GLD) example.
 
-This script constructs a simple global plan and then fills sections
-according to the plan. In practice, the plan could be produced by a
-language model and validated before filling.
+This script constructs a simple global outline and then fills each section with
+placeholder text.
 """
 
-from sciresearch_ai import __version__
+try:
+    from sciresearch_ai import __version__ as _version  # type: ignore
+except Exception:
+    _version = "unknown"
 
 
-def create_plan():
+def create_plan() -> list[str]:
     """Return a simple list representing a global plan."""
-    # Example plan: list of section titles
     return ["Introduction", "Background", "Method", "Conclusion"]
 
 
-def fill_sections(plan):
+def fill_sections(plan: list[str]) -> dict[str, str]:
     """Fill sections according to the plan with placeholder text."""
-    sections = {}
+    sections: dict[str, str] = {}
     for section in plan:
-        sections[section] = (
-            f"This is the {section.lower()} section filled according to the plan."
-        )
+        sections[section] = f"This is the {section.lower()} section filled according to the plan."
     return sections
 
 
-def main():
+def main() -> None:
+    """Demonstrate global‑then‑local decoding."""
     plan = create_plan()
     filled = fill_sections(plan)
-    print(f"sciresearch_ai version: {__version__}")
+    print(f"sciresearch_ai version: {_version}")
     print("Plan:", plan)
     for sec, content in filled.items():
         print(f"{sec}: {content}")
