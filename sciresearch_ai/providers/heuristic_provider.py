@@ -57,41 +57,40 @@ class HeuristicProvider:
         # 1) Planning stage: propose objective and plan
         if "concise research objective" in p_lower:
             return (
-                "Our objective is to evaluate the performance of a simple machine "
-                "learning model on a synthetic regression dataset. The study will "
-                "follow three steps: (1) generate a clean synthetic dataset with a "
-                "known functional relationship and additive noise; (2) implement "
-                "and train a linear regression model and at least one non‑linear "
-                "baseline (e.g., polynomial regression); (3) evaluate the models "
-                "using root mean squared error (RMSE) and discuss the results."
+                "Our objective is to compare classic linear regression against a "
+                "non‑linear ensemble model on a real regression task. Specifically "
+                "we will use the diabetes dataset provided by scikit‑learn "
+                "\\cite{pedregosa2011scikit} and contrast ordinary least squares "
+                "with a random forest regressor \\cite{breiman2001random}. The study "
+                "will load the dataset, perform a train/test split, fit both models, "
+                "and report root mean squared error (RMSE) with proper citations."
             )
         # 2) Experiment design and TTC refinement prompts
         if ("refine this plan" in p_lower) or ("experiment protocol" in p_lower):
             return (
                 "To execute the study we will write a Python script that:\n"
                 "1. Imports numpy and scikit‑learn.\n"
-                "2. Generates 1 000 samples (x, y) from y = 3x + noise where noise ∼ N(0,0.5).\n"
-                "3. Splits the data into training and test sets.\n"
-                "4. Fits a linear regression model and a second‑degree polynomial regression.\n"
+                "2. Loads the diabetes regression dataset.\n"
+                "3. Splits the data into 80% training and 20% testing subsets.\n"
+                "4. Fits a linear regression model and a random forest regressor.\n"
                 "5. Computes RMSE on the test set for both models.\n"
                 "6. Logs the RMSE values to a JSON results file.\n\n"
                 "Pseudo‑code:\n"
                 "    import numpy as np\n"
+                "    from sklearn.datasets import load_diabetes\n"
                 "    from sklearn.linear_model import LinearRegression\n"
-                "    from sklearn.preprocessing import PolynomialFeatures\n"
-                "    from sklearn.pipeline import make_pipeline\n"
+                "    from sklearn.ensemble import RandomForestRegressor\n"
                 "    from sklearn.metrics import mean_squared_error\n\n"
                 "    def run():\n"
-                "        rng = np.random.default_rng(0)\n"
-                "        x = rng.uniform(-5, 5, size=(1000, 1))\n"
-                "        y = 3 * x + rng.normal(scale=0.5, size=(1000, 1))\n"
-                "        x_train, x_test = x[:800], x[800:]\n"
-                "        y_train, y_test = y[:800], y[800:]\n"
+                "        data = load_diabetes()\n"
+                "        x, y = data.data, data.target\n"
+                "        x_train, x_test = x[:354], x[354:]\n"
+                "        y_train, y_test = y[:354], y[354:]\n"
                 "        lin = LinearRegression().fit(x_train, y_train)\n"
-                "        poly = make_pipeline(PolynomialFeatures(2), LinearRegression()).fit(x_train, y_train)\n"
+                "        rf = RandomForestRegressor(random_state=0).fit(x_train, y_train)\n"
                 "        rmse_lin = mean_squared_error(y_test, lin.predict(x_test), squared=False)\n"
-                "        rmse_poly = mean_squared_error(y_test, poly.predict(x_test), squared=False)\n"
-                "        return rmse_lin, rmse_poly\n"
+                "        rmse_rf = mean_squared_error(y_test, rf.predict(x_test), squared=False)\n"
+                "        return rmse_lin, rmse_rf\n"
             )
         # 3) Debate prompts: assess well‑posedness and pitfalls
         if ("is the following experiment" in p_lower) or ("identify pitfalls" in p_lower):
@@ -109,13 +108,14 @@ class HeuristicProvider:
         # would otherwise trigger the critique handler below.
         if "revise the draft" in p_lower:
             return (
-                "This study investigates how well linear and polynomial regression models recover "
-                "a known linear relationship from synthetic data. We generate 1 000 samples "
-                "according to $y = 3x + \\varepsilon$, where $\\varepsilon \sim \\mathcal{N}(0,0.5)$, and "
-                "split them into training and test sets. We then fit a linear regression model and "
-                "a second‑degree polynomial regression. Performance is measured by the root mean "
-                "squared error (RMSE) on the test set. All code is available in the project’s "
-                "`code/` directory, and results are reproducible with the provided random seed."
+                "This study evaluates two regression approaches on the diabetes dataset "
+                "distributed with scikit‑learn \cite{pedregosa2011scikit}. After splitting "
+                "the 442 samples into training and testing partitions, we fit both an "
+                "ordinary least squares model and a random forest regressor "
+                "\cite{breiman2001random}. Model quality is measured via the root mean "
+                "squared error, $\\text{RMSE} = \\sqrt{\\frac{1}{n}\\sum (y_i - \\hat{y}_i)^2}$. "
+                "All experiments are fully reproducible with the provided code and fixed "
+                "random seed."
             )
         # 5) Critique prompts: ask reviewer to critique the draft
         if ("review the following draft" in p_lower) or ("critique" in p_lower):

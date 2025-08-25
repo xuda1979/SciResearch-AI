@@ -54,3 +54,18 @@ def load_model(
                     f"Unable to move model to device {device!r}"
                 ) from exc
     return model, tokenizer
+
+
+def load_local_generator() -> callable:  # pragma: no cover - simple stub
+    """Return a lightweight text generator for tests.
+
+    The real OSS 120B model is far too heavy for unit tests.  This
+    helper provides a minimal callable with a compatible interface so
+    that modules depending on ``load_local_generator`` can run in
+    environments without the large model or the ``transformers``
+    library."""
+
+    def _generator(prompt: str, **_: object) -> str:
+        return "stub"
+
+    return _generator
