@@ -456,3 +456,55 @@ The reference implementations in this repository are meant as a starting point a
 ## SciResearch-AI
 
 This repository also includes `sciresearch_ai`, a reasoning CLI for scientific papers that automates a human-like research loop. For more details on this application, please see the [`sciresearch_ai/README.md`](./sciresearch_ai/README.md) file.
+
+## Research Papers
+
+This repository contains research papers that explore various ideas and concepts. Below is a summary of each paper's objective.
+
+### Proof-Carrying Answers and Property-Based Self-Fuzzing
+
+Proof-Carrying Answers (PCA) require each model output to include a machine-checkable proof or verification script. Property-based self-fuzzing complements PCA by stress-testing claims with generated counterexamples. Together they increase the reliability and verifiability of large language model responses.
+
+### Causal Audit Trails for Transparent LLM Reasoning
+
+Causal Audit Trails (CAT) improve transparency and trust in language model outputs by recording a directed acyclic graph of the sources, tools, prompts, and code paths that influence each claim.
+
+### Field-Programmable Attention for Efficient Long Contexts
+
+This paper introduces Field-Programmable Attention (FPA), a technique to program sparse attention patterns based on task-specific signals to improve long-context utilization and reduce computational cost.
+
+### Semantic-Hash Lattice Memory (SHL-Mem)
+
+Semantic-Hash Lattice Memory (SHL-Mem) is a proposed long-context memory architecture that uses multiple locality-sensitive semantic hashes to organize and retrieve information from very long sequences. By mapping spans of the input into hash buckets along several semantic dimensions (e.g., entities, relations, time), SHL-Mem allows efficient retrieval via lattice joins.
+
+### Global-then-Local Decoding (GLD)
+
+Global-then-Local Decoding (GLD) decomposes generation into two phases: first a global plan is produced that outlines goals and constraints, then local sections are filled under the plan using constrained decoding. This approach reduces contradictions and improves coherence across long documents.
+
+### Counterparty Models with Verifiable Non-Collusion
+
+Counterparty Models with Verifiable Non-Collusion (CNCM) are a radical approach to reduce hallucinations and biases in language models by running multiple specialised models as adversarial partners: an Advocate, a Skeptic, and a Judge. Each model plays a role in producing, challenging and aggregating answers, while cryptographic transcripts prevent collusion.
+
+### Deterministic Shadow-OS for Agents (DSOS)
+
+Deterministic Shadow-OS for Agents (DSOS) is a method to make AI agents safer and more reliable when interacting with operating systems and web interfaces. DSOS forces the agent to produce a deterministic intention log of actions to be executed in a sandbox, enabling human review and rollback before committing changes.
+
+### Answer Futures Market (AFM)
+
+The Answer Futures Market (AFM) is a novel mechanism for routing computational budget in a mixture-of-experts or agents system. Specialists bid their confidence and associated cost to answer a question; a router allocates resources to those with the highest expected value of improvement.
+
+### Entropy-Thermostat Decoding (ETD)
+
+Entropy-Thermostat Decoding (ETD) is a decoding strategy for language models that regulates the entropy of output tokens, aiming to reduce verbosity and stabilize reasoning depth. It dynamically adjusts the sampling temperature based on a target entropy schedule.
+
+### Knowledge Fossilization via Micro-Theorems
+
+Large language models are prone to forgetting or misrepresenting established facts when updated or fine-tuned. To counteract this drift, we propose knowledge fossilization via micro-theorems. Each important domain fact is formalized as a small theorem with an accompanying test or proof. During generation, these micro-theorems can be referenced or imported, ensuring that critical relationships remain consistent across model updates.
+
+### KV Sketching for Long Contexts
+
+Large language models (LLMs) equipped with extremely long context windows suffer from high memory bandwidth requirements and prohibitive VRAM usage because key and value (K/V) states must be stored for every token. “KV-Sketching” is a family of techniques that learns to compress K/V state tensors into compact sketches that can be rehydrated on demand. By combining low-rank approximations, count-sketch hashing and quantization, one can achieve multi-million-token contexts without a linear growth in memory footprint.
+
+### Differentially-Private Ephemeral Memory with Revocation
+
+Long-lived conversational agents risk accumulating sensitive or malicious information in their internal caches. Differentially-Private Ephemeral Memory (DPEM) aims to enforce the “right to be forgotten” and limit prompt‑injection persistence by associating each memory with a privacy budget and a revocation token. When the budget is exhausted or a valid revocation request is received, the memory is purged from the model's context.
